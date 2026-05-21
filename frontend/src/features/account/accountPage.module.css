@@ -1,0 +1,342 @@
+.wrap {
+  max-width: 880px;
+}
+
+.subnav {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 1.5rem;
+  background: var(--ags-surface);
+  border: 1px solid var(--ags-border);
+  border-radius: 10px;
+}
+
+.subnavLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ags-muted);
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.subnavLink:hover {
+  color: var(--ags-text-body);
+  background: var(--ags-bg);
+}
+
+.subnavActive {
+  composes: subnavLink;
+  background: var(--ags-primary-soft);
+  color: var(--ags-primary);
+  font-weight: 600;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(135deg, var(--ags-navy) 0%, var(--ags-primary) 55%, #024a9a 100%);
+  border-radius: 12px;
+  color: var(--ags-primary-on);
+  box-shadow: 0 8px 24px rgb(3 59 125 / 18%);
+}
+
+.heroAvatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: rgb(255 255 255 / 18%);
+  border: 2px solid rgb(241 198 98 / 55%);
+  color: var(--ags-yellow);
+}
+
+.heroBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.heroName {
+  margin: 0 0 4px;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.heroMeta {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.88;
+}
+
+.heroBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.roleHr {
+  composes: badge;
+  background: rgb(241 198 98 / 22%);
+  color: var(--ags-yellow);
+  border: 1px solid rgb(241 198 98 / 40%);
+}
+
+.roleSup {
+  composes: badge;
+  background: rgb(255 255 255 / 14%);
+  color: #e2e8f0;
+  border: 1px solid rgb(255 255 255 / 28%);
+}
+
+.roleStaff {
+  composes: badge;
+  background: rgb(255 255 255 / 12%);
+  color: #cbd5e1;
+  border: 1px solid rgb(255 255 255 / 22%);
+}
+
+.roleTbdh {
+  composes: badge;
+  background: rgb(167 139 250 / 22%);
+  color: #e9d5ff;
+  border: 1px solid rgb(167 139 250 / 35%);
+}
+
+.codeBadge {
+  composes: badge;
+  background: rgb(0 0 0 / 18%);
+  color: rgb(255 255 255 / 92%);
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.card {
+  background: var(--ags-surface);
+  border: 1px solid var(--ags-border);
+  border-radius: var(--ags-radius, 8px);
+  overflow: hidden;
+}
+
+.cardTitle {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ags-muted);
+  background: var(--ags-bg);
+  border-bottom: 1px solid var(--ags-border);
+}
+
+.cardBody {
+  padding: 4px 0;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowLabel {
+  font-size: 13px;
+  color: var(--ags-muted);
+  flex-shrink: 0;
+}
+
+.rowValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ags-text-body);
+  text-align: right;
+  word-break: break-word;
+}
+
+.rowValueMono {
+  composes: rowValue;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--ags-primary-on);
+  background: var(--ags-primary);
+  border: 1px solid var(--ags-primary);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.cta:hover {
+  background: var(--ags-primary-hover);
+  border-color: var(--ags-primary-hover);
+}
+
+.ctaSecondary {
+  composes: cta;
+  color: var(--ags-primary);
+  background: var(--ags-surface);
+  border-color: var(--ags-border);
+}
+
+.ctaSecondary:hover {
+  background: var(--ags-primary-soft);
+  border-color: var(--ags-primary);
+}
+
+.settingsLayout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 720px) {
+  .settingsLayout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    align-items: start;
+  }
+}
+
+.sectionCard {
+  composes: card;
+}
+
+.sectionHint {
+  margin: 0;
+  padding: 0 16px 12px;
+  font-size: 12px;
+  color: var(--ags-muted);
+  line-height: 1.5;
+}
+
+.langGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 12px 16px 16px;
+}
+
+.langOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 10px;
+  border: 2px solid var(--ags-border);
+  border-radius: 10px;
+  background: var(--ags-surface);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ags-text-body);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.langOption:hover {
+  border-color: #cbd5e1;
+  background: var(--ags-bg);
+}
+
+.langOptionActive {
+  composes: langOption;
+  border-color: var(--ags-primary);
+  background: var(--ags-primary-soft);
+  box-shadow: 0 0 0 1px var(--ags-primary);
+}
+
+.langFlag {
+  width: 36px;
+  height: 26px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.langCheck {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ags-primary);
+}
+
+.passwordForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px 16px;
+}
+
+.alertStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 4px;
+}
+
+.mustChangeBanner {
+  margin-bottom: 1rem;
+}

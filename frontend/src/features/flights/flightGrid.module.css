@@ -1,0 +1,231 @@
+.cellFrame {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.delayInput {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: 28px;
+  padding: 2px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.delayInput:focus {
+  outline: none;
+  border-color: #033b7d;
+  box-shadow: 0 0 0 2px rgba(3, 59, 125, 0.15);
+}
+
+.delayInput:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+.delaySaving {
+  opacity: 0.6;
+}
+
+.timeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  box-sizing: border-box;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.timeBtn:hover {
+  background: rgba(3, 59, 125, 0.06);
+  border-color: rgba(3, 59, 125, 0.12);
+}
+
+.timeBtn:focus-visible {
+  outline: none;
+  border-color: #033b7d;
+  box-shadow: 0 0 0 2px rgba(3, 59, 125, 0.15);
+}
+
+.timeBtnDelayed {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.timeBtnDelayed:hover {
+  background: #fee2e2;
+}
+
+.timeBtnEmpty .timeMuted {
+  color: #64748b;
+}
+
+.delayBadge {
+  flex: 0 0 auto;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #b91c1c;
+  background: #fee2e2;
+  line-height: 1.3;
+}
+
+.etaEtdEdit {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  min-width: 0;
+}
+
+.etaEtdEdit .delayInput {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  max-width: none;
+  height: 30px;
+  font-size: 13px;
+}
+
+.timePlain {
+  flex: 1;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.timeDelayed {
+  color: #dc2626;
+}
+
+.timeMuted {
+  flex: 1;
+  min-width: 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.delayUnit {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  line-height: 1;
+}
+
+.acBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-width: 0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: ui-monospace, monospace;
+  line-height: 1.2;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notesWrap {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  align-items: center;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  max-width: 100%;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chipInfo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  max-width: 100%;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: rgba(3, 59, 125, 0.08);
+  color: #033b7d;
+  border: 1px solid rgba(3, 59, 125, 0.2);
+}
+
+.remarkText {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  white-space: normal;
+  line-height: 1.35;
+  font-size: 12px;
+  word-break: break-word;
+}
+
+.chipVip {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  max-width: 100%;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}

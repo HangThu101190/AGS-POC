@@ -1,0 +1,115 @@
+/* Mobile shell — prototype mobStyles (phone frame omitted; real device layout) */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--ags-bg);
+}
+
+.roleBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--ags-primary);
+  color: var(--ags-primary-on);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 100%;
+  background: var(--ags-navy);
+  color: var(--ags-yellow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.roleMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.roleName {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roleSub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rolePill {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--ags-yellow);
+  color: var(--ags-navy);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.main {
+  flex: 1;
+  overflow: auto;
+  padding: 12px 12px 72px;
+  background: var(--ags-bg);
+}
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(480px, 100%);
+  height: 64px;
+  display: flex;
+  border-top: 1px solid var(--ags-border);
+  background: var(--ags-surface);
+  z-index: 10;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 4px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: #94a3b8;
+  border: none;
+  background: transparent;
+}
+
+.tabActive {
+  color: var(--ags-text-body);
+  font-weight: 600;
+}
+
+.tabIcon {
+  font-size: 18px;
+  line-height: 1;
+}
