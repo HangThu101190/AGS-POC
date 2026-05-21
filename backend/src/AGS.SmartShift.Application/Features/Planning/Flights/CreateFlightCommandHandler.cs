@@ -32,7 +32,13 @@ public sealed class CreateFlightCommandHandler : IRequestHandler<CreateFlightCom
         var body = request.Body;
         var plan = await _weeks.GetOrCreateWeekAsync(body.WeekId, cancellationToken);
         PastDayGuard.EnsureMutableDay(body.DayIdx, plan.TodayIdx, "thêm chuyến bay");
-        await FlightScheduleGuard.EnsureMutableAsync(_schedules, plan.WeekId, "thêm chuyến bay", cancellationToken);
+        await FlightScheduleGuard.EnsureMutableForDayAsync(
+            _schedules,
+            plan.WeekId,
+            body.DayIdx,
+            plan.TodayIdx,
+            "thêm chuyến bay",
+            cancellationToken);
 
         var flight = Flight.Create(
             plan.SiteId,

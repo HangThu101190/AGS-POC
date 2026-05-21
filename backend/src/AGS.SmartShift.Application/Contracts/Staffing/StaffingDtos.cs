@@ -19,6 +19,10 @@ public sealed class StaffingPlanDto
     public DailyStaffingPlanStatus Status { get; init; }
     public string? HeaderJson { get; init; }
     public DateTime? ConfirmedAt { get; init; }
+    public DateTime? PublishedAt { get; init; }
+    public Guid? PublishedByEmployeeId { get; init; }
+    public string? LockReason { get; init; }
+    public bool IsLocked { get; init; }
 }
 
 public sealed class StaffingLineDto
@@ -126,6 +130,7 @@ public sealed class PvhkExportRequest
     public required StaffingDayDto Day { get; init; }
     public required string DayLabel { get; init; }
     public int CalendarYear { get; init; } = DateTime.UtcNow.Year;
+    public StaffingBioHeaderDto? Bio { get; init; }
 }
 
 public sealed class PvhkWeekExportRequest

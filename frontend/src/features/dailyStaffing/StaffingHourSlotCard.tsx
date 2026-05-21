@@ -110,6 +110,10 @@ export function StaffingHourSlotCard({
     () => hourSlotFlightGroupsForCard(flightGroups),
     [flightGroups],
   );
+  const maxFlightsOnCard = 4;
+  const visibleFlightGroups = cardFlightGroups.slice(0, maxFlightsOnCard);
+  const hiddenFlightCount = Math.max(0, cardFlightGroups.length - visibleFlightGroups.length);
+  const showPerFlightGapHint = cardFlightGroups.length <= 2;
   const flights = useMemo(() => flightsInHourSlot(day, hour), [day, hour]);
   const danger = useMemo(() => isShiftUnderstaffed(day, hour), [day, hour]);
   const need = hourTargetStaff(day, hour);
@@ -164,9 +168,9 @@ export function StaffingHourSlotCard({
         )}
       </div>
 
-      {cardFlightGroups.length > 0 ? (
+      {visibleFlightGroups.length > 0 ? (
         <div className="staffing-slot-card__flights staffing-slot-card__flights--with-staff">
-          {cardFlightGroups.map((group) => {
+          {visibleFlightGroups.map((group) => {
             const time =
               flightEtaEtdDisplayTime(group.flight, "etd") || group.flight.std || "";
             const manningCls = manningChipClass(group.assigned, group.need);
@@ -235,12 +239,17 @@ export function StaffingHourSlotCard({
                       </div>
                     ))}
                   </div>
-                ) : gap ? (
+                ) : gap && showPerFlightGapHint ? (
                   <p className="staffing-slot-card__flight-gap">{t("staffing.hourSlotFlightGap")}</p>
                 ) : null}
               </section>
             );
           })}
+          {hiddenFlightCount > 0 ? (
+            <p className="staffing-slot-card__more">
+              {t("staffing.hourSlotMoreFlights", { count: hiddenFlightCount })}
+            </p>
+          ) : null}
         </div>
       ) : null}
     </div>

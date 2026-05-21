@@ -7,6 +7,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Alert, ButtonOutlined, ButtonPrimary, Loading } from "@/components/ui";
+import { EmployeeQualificationsConfigSection } from "@/features/config/EmployeeQualificationsConfigSection";
+import { ShiftTemplatesConfigSection } from "@/features/config/ShiftTemplatesConfigSection";
 import {
   createAircraftManningRule,
   createAirlineManningRule,
@@ -241,6 +243,9 @@ export function ManningRulesTab() {
           ))}
         </tbody>
       </Box>
+
+      <ShiftTemplatesConfigSection />
+      <EmployeeQualificationsConfigSection />
     </Box>
   );
 }

@@ -31,7 +31,13 @@ public sealed class DeleteFlightCommandHandler : IRequestHandler<DeleteFlightCom
             ?? throw new DomainException("plan_not_found", "Không tìm thấy kế hoạch tuần.");
 
         PastDayGuard.EnsureMutableDay(flight.DayIdx, plan.TodayIdx, "xóa chuyến bay");
-        await FlightScheduleGuard.EnsureMutableAsync(_schedules, flight.WeekId, "xóa chuyến bay", cancellationToken);
+        await FlightScheduleGuard.EnsureMutableForDayAsync(
+            _schedules,
+            flight.WeekId,
+            flight.DayIdx,
+            plan.TodayIdx,
+            "xóa chuyến bay",
+            cancellationToken);
         await _flights.DeleteAsync(flight, cancellationToken);
         return Unit.Value;
     }

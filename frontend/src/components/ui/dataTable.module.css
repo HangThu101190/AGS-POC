@@ -52,9 +52,9 @@
 }
 
 .gridRefreshing .gridInner {
-  opacity: 0.72;
+  opacity: 0.88;
   pointer-events: none;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.12s ease;
 }
 
 @media (max-width: 899px) {

@@ -24,6 +24,9 @@ public sealed class EmployeeConfiguration : AuditableEntityConfiguration<Employe
             .IsRequired();
         builder.Property(e => e.ManagerId).HasColumnName("manager_id");
         builder.Property(e => e.IsActive).HasColumnName("is_active").IsRequired();
+        builder.Property(e => e.DefaultSegment).HasColumnName("default_segment").HasConversion<string>().HasMaxLength(10);
+        builder.Property(e => e.PreferredShiftCode).HasColumnName("preferred_shift_code").HasMaxLength(20);
+        builder.Property(e => e.MaxWeeklyHours).HasColumnName("max_weekly_hours").HasPrecision(4, 1).HasDefaultValue(48m);
 
         builder.HasIndex(e => e.Code).IsUnique();
         builder.HasIndex(e => e.Name).HasDatabaseName("ix_employees_name");

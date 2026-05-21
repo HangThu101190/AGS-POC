@@ -10,6 +10,9 @@ public sealed class DailyStaffingRepository : IDailyStaffingRepository
 
     public DailyStaffingRepository(SmartShiftDbContext db) => _db = db;
 
+    public Task<DailyStaffingPlan?> GetPlanByIdAsync(Guid planId, CancellationToken cancellationToken = default) =>
+        _db.DailyStaffingPlans.FirstOrDefaultAsync(p => p.Id == planId, cancellationToken);
+
     public Task<DailyStaffingPlan?> GetPlanAsync(
         Guid siteId,
         string weekId,
@@ -73,6 +76,52 @@ public sealed class DailyStaffingRepository : IDailyStaffingRepository
         CancellationToken cancellationToken = default) =>
         _db.FlightCrewAssignments.FirstOrDefaultAsync(a => a.Id == assignmentId, cancellationToken);
 
+    public Task<IReadOnlyList<StaffingCrewProposal>> ListProposalsForPlanAsync(
+        Guid planId,
+        CancellationToken cancellationToken = default) =>
+        _db.StaffingCrewProposals
+            .Where(p => p.DailyStaffingPlanId == planId)
+            .OrderBy(p => p.SortOrder)
+            .ToListAsync(cancellationToken)
+            .ContinueWith(t => (IReadOnlyList<StaffingCrewProposal>)t.Result, cancellationToken);
+
+    public async Task ReplaceProposalsAsync(
+        Guid planId,
+        IReadOnlyList<StaffingCrewProposal> proposals,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await _db.StaffingCrewProposals
+            .Where(p => p.DailyStaffingPlanId == planId)
+            .ToListAsync(cancellationToken);
+        _db.StaffingCrewProposals.RemoveRange(existing);
+        if (proposals.Count > 0)
+        {
+            await _db.StaffingCrewProposals.AddRangeAsync(proposals, cancellationToken);
+        }
+    }
+
+    public Task<DailyStaffingBioHeader?> GetBioHeaderAsync(
+        Guid planId,
+        CancellationToken cancellationToken = default) =>
+        _db.DailyStaffingBioHeaders.FirstOrDefaultAsync(h => h.DailyStaffingPlanId == planId, cancellationToken);
+
+    public async Task<DailyStaffingBioHeader> GetOrCreateBioHeaderAsync(
+        Guid planId,
+        DateTime utcNow,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await GetBioHeaderAsync(planId, cancellationToken);
+        if (existing is not null)
+        {
+            return existing;
+        }
+
+        var header = DailyStaffingBioHeader.Create(planId, utcNow);
+        await _db.DailyStaffingBioHeaders.AddAsync(header, cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
+        return header;
+    }
+
     public async Task ReplaceLinesAsync(
         Guid planId,
         IReadOnlyList<DailyStaffingLine> lines,
@@ -95,6 +144,25 @@ public sealed class DailyStaffingRepository : IDailyStaffingRepository
         if (lines.Count > 0)
         {
             await _db.DailyStaffingLines.AddRangeAsync(lines, cancellationToken);
+        }
+    }
+
+    public async Task ReplaceAssignmentsForPlanAsync(
+        Guid planId,
+        IReadOnlyList<FlightCrewAssignment> assignments,
+        CancellationToken cancellationToken = default)
+    {
+        var lineIds = await _db.DailyStaffingLines
+            .Where(l => l.DailyStaffingPlanId == planId)
+            .Select(l => l.Id)
+            .ToListAsync(cancellationToken);
+        var existing = await _db.FlightCrewAssignments
+            .Where(a => lineIds.Contains(a.StaffingLineId))
+            .ToListAsync(cancellationToken);
+        _db.FlightCrewAssignments.RemoveRange(existing);
+        if (assignments.Count > 0)
+        {
+            await _db.FlightCrewAssignments.AddRangeAsync(assignments, cancellationToken);
         }
     }
 

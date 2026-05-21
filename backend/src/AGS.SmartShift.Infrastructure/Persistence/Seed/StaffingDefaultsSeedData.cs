@@ -15,6 +15,21 @@ public static class StaffingDefaultsSeedData
         await EnsureManningRulesAsync(db, siteId, now, cancellationToken);
         await EnsureLeaveTypesAsync(db, now, cancellationToken);
         await EnsureShiftPoliciesAsync(db, siteId, now, cancellationToken);
+        await EnsureShiftTemplatesAsync(db, now, cancellationToken);
+    }
+
+    private static async Task EnsureShiftTemplatesAsync(
+        SmartShiftDbContext db,
+        DateTime now,
+        CancellationToken cancellationToken)
+    {
+        if (await db.ShiftTemplates.AnyAsync(cancellationToken))
+        {
+            return;
+        }
+
+        db.ShiftTemplates.AddRange(ShiftTemplateSeedData.Build(now));
+        await db.SaveChangesAsync(cancellationToken);
     }
 
     private static async Task EnsureManningRulesAsync(

@@ -41,6 +41,7 @@ public static class SmartShiftDbInitializer
             await RolePermissionCatalogSeedData.SeedAsync(db, cancellationToken);
             await StaffingCatalogSeedData.SeedAsync(db, cancellationToken);
             await StaffingDefaultsSeedData.SeedAsync(db, cancellationToken);
+            await PvhkStaffPoolSeedData.SeedAsync(db, cancellationToken);
             await WorkZoneSeedData.SeedAsync(db, cancellationToken);
             var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
             await AuthSeedData.SeedAsync(db, passwordHasher, cancellationToken);

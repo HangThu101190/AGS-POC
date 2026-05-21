@@ -15,6 +15,9 @@ public sealed class DailyStaffingPlanConfiguration : AuditableEntityConfiguratio
         builder.Property(p => p.DepartmentCode).HasMaxLength(32).IsRequired();
         builder.Property(p => p.HeaderJson).HasColumnType("jsonb");
         builder.Property(p => p.ConfirmedAtUtc).HasColumnName("confirmed_at");
+        builder.Property(p => p.PublishedAtUtc).HasColumnName("published_at");
+        builder.Property(p => p.PublishedByEmployeeId).HasColumnName("published_by");
+        builder.Property(p => p.LockReason).HasMaxLength(500).HasColumnName("lock_reason");
         builder.HasIndex(p => new { p.SiteId, p.WeekId, p.DayIdx, p.DepartmentCode })
             .IsUnique()
             .HasDatabaseName("uq_daily_staffing_plans_site_week_day_dept");

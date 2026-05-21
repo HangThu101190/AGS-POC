@@ -4,6 +4,8 @@ namespace AGS.SmartShift.Domain.Repositories;
 
 public interface IDailyStaffingRepository
 {
+    Task<DailyStaffingPlan?> GetPlanByIdAsync(Guid planId, CancellationToken cancellationToken = default);
+
     Task<DailyStaffingPlan?> GetPlanAsync(
         Guid siteId,
         string weekId,
@@ -33,10 +35,33 @@ public interface IDailyStaffingRepository
         Guid assignmentId,
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<StaffingCrewProposal>> ListProposalsForPlanAsync(
+        Guid planId,
+        CancellationToken cancellationToken = default);
+
+    Task ReplaceProposalsAsync(
+        Guid planId,
+        IReadOnlyList<StaffingCrewProposal> proposals,
+        CancellationToken cancellationToken = default);
+
+    Task<DailyStaffingBioHeader?> GetBioHeaderAsync(
+        Guid planId,
+        CancellationToken cancellationToken = default);
+
+    Task<DailyStaffingBioHeader> GetOrCreateBioHeaderAsync(
+        Guid planId,
+        DateTime utcNow,
+        CancellationToken cancellationToken = default);
+
     Task ReplaceLinesAsync(
         Guid planId,
         IReadOnlyList<DailyStaffingLine> lines,
         bool removeOrphanAssignments,
+        CancellationToken cancellationToken = default);
+
+    Task ReplaceAssignmentsForPlanAsync(
+        Guid planId,
+        IReadOnlyList<FlightCrewAssignment> assignments,
         CancellationToken cancellationToken = default);
 
     Task AddAssignmentAsync(FlightCrewAssignment assignment, CancellationToken cancellationToken = default);

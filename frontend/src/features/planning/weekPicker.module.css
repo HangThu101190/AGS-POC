@@ -285,10 +285,94 @@
   margin-bottom: 12px;
 }
 
-/* Used with .bar.compact on flights week + day chip row */
-.inRow {
+/* Flights toolbar row — same height/radius as day chips (6px, ~32px) */
+.bar.inline.inRow {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 0;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: none;
+  overflow: hidden;
+  height: 32px;
+  box-sizing: border-box;
 }
 
+.bar.inline.inRow .navBtn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 32px;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: #fff;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.bar.inline.inRow .navBtn:hover:not(:disabled) {
+  background: rgba(3, 59, 125, 0.06);
+}
+
+.bar.inline.inRow .main {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.bar.inline.inRow .trigger {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  gap: 6px;
+  border: none;
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  border-radius: 0;
+  background: #fff;
+}
+
+.bar.inline.inRow .trigger:hover,
+.bar.inline.inRow .triggerOpen {
+  background: rgba(3, 59, 125, 0.05);
+  border-color: #e2e8f0;
+}
+
+.bar.inline.inRow .range {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.bar.inline.inRow .badge {
+  padding: 2px 6px;
+  font-size: 10px;
+  border-radius: 4px;
+}
+
+.bar.inline.inRow .chevron {
+  margin-left: 2px;
+  font-size: 10px;
+}
+
+.bar.inline.inRow .range,
+.bar.inline.inRow .badge {
+  transition: opacity 0.15s ease;
+}
+
+.bar.inline.inRow.weekBusy .range {
+  opacity: 0.55;
+}
+
+
+/* Used with .bar.compact on staffing board week row */
 .bar.compact.inRow {
   margin-bottom: 0;
   flex-shrink: 0;

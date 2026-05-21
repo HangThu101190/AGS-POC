@@ -11,6 +11,9 @@ public sealed class Employee : AuditableEntity<Guid>
     public UserRole Role { get; private set; }
     public Guid? ManagerId { get; private set; }
     public bool IsActive { get; private set; } = true;
+    public OperationalSegment? DefaultSegment { get; private set; }
+    public string? PreferredShiftCode { get; private set; }
+    public decimal MaxWeeklyHours { get; private set; } = 48m;
 
     private Employee()
     {
@@ -54,6 +57,20 @@ public sealed class Employee : AuditableEntity<Guid>
     public void SetActive(bool isActive, DateTime utcNow)
     {
         IsActive = isActive;
+        MarkUpdated(utcNow);
+    }
+
+    public void UpdateStaffingPreferences(
+        OperationalSegment? defaultSegment,
+        string? preferredShiftCode,
+        decimal maxWeeklyHours,
+        DateTime utcNow)
+    {
+        DefaultSegment = defaultSegment;
+        PreferredShiftCode = string.IsNullOrWhiteSpace(preferredShiftCode)
+            ? null
+            : preferredShiftCode.Trim().ToUpperInvariant();
+        MaxWeeklyHours = maxWeeklyHours > 0 ? maxWeeklyHours : 48m;
         MarkUpdated(utcNow);
     }
 }

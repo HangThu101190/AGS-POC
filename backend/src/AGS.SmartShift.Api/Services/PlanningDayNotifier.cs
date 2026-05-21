@@ -58,4 +58,14 @@ public sealed class PlanningDayNotifier : IPlanningDayNotifier
                 "importProgress",
                 new { weekId, dayIdx, jobId, progressPercent, status },
                 cancellationToken);
+
+    public Task NotifyFlightSchedulePublishedAsync(
+        string weekId,
+        IReadOnlyList<int> staleDayIndices,
+        CancellationToken cancellationToken = default) =>
+        _hub.Clients.Group(PlanningHub.WeekGroup(weekId))
+            .SendAsync(
+                "flightSchedulePublished",
+                new { weekId, staleDayIndices },
+                cancellationToken);
 }

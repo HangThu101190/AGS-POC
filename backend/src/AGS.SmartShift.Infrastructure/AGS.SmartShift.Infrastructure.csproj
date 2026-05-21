@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\..\..\reference-data\Kế_hoạch_bay.xlsx" LogicalName="Seed.Data.Ke_hoach_bay.xlsx" />
-    <EmbeddedResource Include="..\..\..\..\reference-data\PVHK_Di_Lich_phan_cong_theo_ngay.xlsx" LogicalName="Seed.Data.Pvhk_Di_Lich_phan_cong_theo_ngay.xlsx" />
+    <EmbeddedResource Include="..\..\..\reference-data\Kế_hoạch_bay.xlsx" LogicalName="Seed.Data.Ke_hoach_bay.xlsx" Condition="Exists('..\..\..\reference-data\Kế_hoạch_bay.xlsx')" />
+    <EmbeddedResource Include="..\..\..\reference-data\PVHK_Di_Lich_phan_cong_theo_ngay.xlsx" LogicalName="Seed.Data.Pvhk_Di_Lich_phan_cong_theo_ngay.xlsx" Condition="Exists('..\..\..\reference-data\PVHK_Di_Lich_phan_cong_theo_ngay.xlsx')" />
   </ItemGroup>
 
   <ItemGroup>

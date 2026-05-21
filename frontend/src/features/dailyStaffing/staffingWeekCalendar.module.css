@@ -621,7 +621,7 @@
   gap: 4px;
   flex: 1 1 auto;
   min-height: 0;
-  max-height: none;
+  max-height: min(12rem, 100%);
   overflow: auto;
 }
 

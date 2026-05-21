@@ -30,4 +30,9 @@ public interface IPlanningDayNotifier
         int progressPercent,
         string status,
         CancellationToken cancellationToken = default);
+
+    Task NotifyFlightSchedulePublishedAsync(
+        string weekId,
+        IReadOnlyList<int> staleDayIndices,
+        CancellationToken cancellationToken = default);
 }

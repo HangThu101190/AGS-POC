@@ -6,4 +6,5 @@ public enum DailyStaffingPlanStatus
     Proposed = 1,
     CrewDraft = 2,
     Confirmed = 3,
+    Published = 4,
 }

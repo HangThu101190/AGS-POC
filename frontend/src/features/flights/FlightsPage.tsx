@@ -7,9 +7,8 @@ import type {
 } from "ag-grid-community";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { DataTable, Loading } from "@/components/ui";
+import { DataTable } from "@/components/ui";
 import { isEmptyCellValue } from "@/lib/agGrid/formatCell";
 import { gridCol } from "@/shared/ui/gridColumn";
 import { WeekDayChips } from "@/features/planning/WeekDayChips";
@@ -44,14 +43,13 @@ import { useWeekScope } from "@/shared/planning/WeekScopeContext";
 import { isAllWeekDay } from "@/shared/planning/weekDayFilter";
 import { usePlanningDaySync } from "@/shared/signalr/usePlanningDaySync";
 import type { PlanningHubEvent } from "@/shared/signalr/planningHub";
-import { routePathFor } from "@/shared/routing/routePaths";
 import { StatusBanner, ActionButton, WeekPageShell } from "@/shared/webChrome";
 
 export function FlightsPage() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const canManage = user ? canManageFlights(user.role) : false;
-  const { weekId, weekMeta, plan, planLoading, planError } = useWeekScope();
+  const { weekId, weekMeta, planError } = useWeekScope();
   const fileRef = useRef<HTMLInputElement>(null);
   const [dayIdx, setDayIdx] = useState<number | null>(null);
   const [weekFlightTotal, setWeekFlightTotal] = useState(0);
@@ -93,8 +91,9 @@ export function FlightsPage() {
 
   useEffect(() => {
     let cancelled = false;
+    const reqWeek = weekId;
     setLoadError(planError ? t("flights.loadFailed") : null);
-    void fetchFlightSchedule(weekId)
+    void fetchFlightSchedule(reqWeek)
       .then((s) => {
         if (!cancelled) setSchedule(s);
       })
@@ -102,13 +101,12 @@ export function FlightsPage() {
         console.warn("[FlightsPage] flight schedule load failed", err);
         if (!cancelled) setSchedule(null);
       });
-    void fetchFlightsPage({ page: 0, pageSize: 1, weekId })
+    void fetchFlightsPage({ page: 0, pageSize: 1, weekId: reqWeek })
       .then((r) => {
         if (!cancelled) setWeekFlightTotal(r.totalCount);
       })
       .catch((err) => {
         console.warn("[FlightsPage] flight count load failed", err);
-        if (!cancelled) setWeekFlightTotal(0);
       });
     return () => {
       cancelled = true;
@@ -119,6 +117,10 @@ export function FlightsPage() {
   const selectedDay = dayIdx ?? todayIdx;
   const allWeek = isAllWeekDay(selectedDay);
   const isPastFilter = !allWeek && isPastDay(selectedDay, todayIdx);
+  const scheduleLockBlocks =
+    Boolean(schedule?.isLocked) && weekMeta.kind === "past";
+  const canMutateFlights = canManage && !isPastFilter && !scheduleLockBlocks;
+  const showPublishSchedule = canManage && !isPastFilter && weekMeta.kind !== "past";
   const syncDayIdx = allWeek ? todayIdx : selectedDay;
 
   const finishImportUi = useCallback(
@@ -410,18 +412,14 @@ export function FlightsPage() {
   };
 
   const formDayIdx = allWeek ? todayIdx : selectedDay;
-  const showFlightActions = canManage && !isPastFilter;
   const hasBanners = Boolean(message || warnings.length > 0 || loadError || error);
 
   return (
     <WeekPageShell weekInHeader={false} fill>
       <div className={styles.page}>
-        {planLoading && !plan ? (
-          <Loading label={t("common.loading")} />
-        ) : null}
         <div className={styles.toolbarOneRow}>
           <div className={styles.toolbarWeek}>
-            <WeekPicker compact inRow />
+            <WeekPicker inline inRow />
           </div>
           <div className={styles.chipsWrap}>
             <WeekDayChips
@@ -435,17 +433,9 @@ export function FlightsPage() {
               allWeekCount={weekFlightTotal}
             />
           </div>
-          <div className={styles.toolbarActions}>
-            <Link
-              className={styles.actionBtn}
-              to={`${routePathFor("dailyStaffing", i18n.language)}?ngay=${syncDayIdx}`}
-            >
-              {t("staffing.openFromFlights")}
-            </Link>
-          </div>
-          {showFlightActions ? (
+          {canMutateFlights || showPublishSchedule ? (
             <div className={styles.toolbarActions}>
-              {schedule && !schedule.isLocked ? (
+              {showPublishSchedule ? (
                 <ActionButton
                   className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
                   variant="primary"
@@ -454,7 +444,9 @@ export function FlightsPage() {
                     try {
                       const next = await publishFlightSchedule(weekId);
                       setSchedule(next);
-                      setMessage(t("flights.schedulePublished"));
+                      setMessage(
+                        `${t("flights.schedulePublished")} ${t("flights.staffingRefreshHint")}`,
+                      );
                     } catch {
                       setError(t("flights.actionFailed"));
                     }
@@ -463,7 +455,7 @@ export function FlightsPage() {
                   {t("flights.publishSchedule")}
                 </ActionButton>
               ) : null}
-              {!schedule?.isLocked ? (
+              {canMutateFlights ? (
                 <>
                   <ActionButton
                     className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
@@ -544,8 +536,7 @@ export function FlightsPage() {
               },
               getRowStyle: (p) =>
                 p.data?.isDelayed && !p.data?.isVip ? { background: "#fef2f2" } : undefined,
-              onRowDoubleClicked:
-                canManage && !isPastFilter && !schedule?.isLocked
+              onRowDoubleClicked: canMutateFlights
                   ? (e) => {
                       if (e.data) {
                         setEditFlight(e.data);

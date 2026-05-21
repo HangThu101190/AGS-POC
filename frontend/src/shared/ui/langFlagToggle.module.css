@@ -1,0 +1,40 @@
+.flagBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  min-width: var(--ags-touch-min, 44px);
+  min-height: var(--ags-touch-min, 44px);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+  vertical-align: middle;
+  border-radius: 4px;
+}
+
+@media (min-width: 900px) {
+  .flagBtn {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+.flagBtn:hover {
+  opacity: 0.85;
+}
+
+.flagBtn:focus-visible {
+  outline: 2px solid var(--ags-primary);
+  outline-offset: 2px;
+}
+
+.flag {
+  width: 28px;
+  height: 20px;
+  display: block;
+  flex-shrink: 0;
+  border-radius: 2px;
+  overflow: hidden;
+}

@@ -36,7 +36,13 @@ public sealed class UpdateFlightCommandHandler : IRequestHandler<UpdateFlightCom
             ?? throw new DomainException("plan_not_found", "Không tìm thấy kế hoạch tuần.");
 
         PastDayGuard.EnsureMutableDay(flight.DayIdx, plan.TodayIdx, "sửa chuyến bay");
-        await FlightScheduleGuard.EnsureMutableAsync(_schedules, flight.WeekId, "sửa chuyến bay", cancellationToken);
+        await FlightScheduleGuard.EnsureMutableForDayAsync(
+            _schedules,
+            flight.WeekId,
+            flight.DayIdx,
+            plan.TodayIdx,
+            "sửa chuyến bay",
+            cancellationToken);
 
         var body = request.Body;
         flight.UpdateDetails(

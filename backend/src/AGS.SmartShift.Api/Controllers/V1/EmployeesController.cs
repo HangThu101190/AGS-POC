@@ -1,7 +1,9 @@
 using AGS.SmartShift.Application.Common.Constants;
 using AGS.SmartShift.Application.Contracts.Common;
 using AGS.SmartShift.Application.Contracts.Identity;
+using AGS.SmartShift.Application.Contracts.Staffing;
 using AGS.SmartShift.Application.Features.Identity.Employees;
+using AGS.SmartShift.Application.Features.Staffing;
 using CreateEmployeeUserCommand = AGS.SmartShift.Application.Features.Identity.Employees.CreateEmployeeUserCommand;
 using PatchEmployeeUserCommand = AGS.SmartShift.Application.Features.Identity.Employees.PatchEmployeeUserCommand;
 using ResetEmployeePasswordCommand = AGS.SmartShift.Application.Features.Identity.Employees.ResetEmployeePasswordCommand;
@@ -92,6 +94,18 @@ public sealed class EmployeesController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new PatchEmployeeUserCommand(id, body), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPut("{id:guid}/qualifications")]
+    [Authorize(Policy = SmartShiftRoles.PolicyHr)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpsertQualifications(
+        Guid id,
+        [FromBody] UpsertEmployeeQualificationsDto body,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new UpsertEmployeeQualificationsCommand(id, body), cancellationToken);
         return Ok(result);
     }
 }

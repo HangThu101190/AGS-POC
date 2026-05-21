@@ -126,6 +126,13 @@ public sealed class CreateStaffingAssignmentCommandHandler
         var body = request.Body;
         var line = await _staffing.GetLineByIdAsync(body.StaffingLineId, cancellationToken)
             ?? throw new DomainException("line_not_found", "Không tìm thấy dòng phân công.");
+        var plan = await _staffing.GetPlanByIdAsync(line.DailyStaffingPlanId, cancellationToken)
+            ?? throw new DomainException("plan_not_found", "Không tìm thấy kế hoạch phân công.");
+        if (plan.IsLocked)
+        {
+            throw new DomainException("plan_locked", "Ngày đã phát hành, không thể sửa phân công.");
+        }
+
         var flight = await _flights.GetByIdAsync(line.FlightId, cancellationToken)
             ?? throw new DomainException("flight_not_found", "Không tìm thấy chuyến bay.");
         var employee = await _employees.GetByIdAsync(body.EmployeeId, cancellationToken)
@@ -191,6 +198,13 @@ public sealed class UpdateStaffingAssignmentCommandHandler
             ?? throw new DomainException("assignment_not_found", "Không tìm thấy phân công.");
         var line = await _staffing.GetLineByIdAsync(assignment.StaffingLineId, cancellationToken)
             ?? throw new DomainException("line_not_found", "Không tìm thấy dòng phân công.");
+        var plan = await _staffing.GetPlanByIdAsync(line.DailyStaffingPlanId, cancellationToken)
+            ?? throw new DomainException("plan_not_found", "Không tìm thấy kế hoạch phân công.");
+        if (plan.IsLocked)
+        {
+            throw new DomainException("plan_locked", "Ngày đã phát hành, không thể sửa phân công.");
+        }
+
         var flight = await _flights.GetByIdAsync(line.FlightId, cancellationToken)
             ?? throw new DomainException("flight_not_found", "Không tìm thấy chuyến bay.");
         var planAssignments = await _staffing.ListAssignmentsForPlanAsync(line.DailyStaffingPlanId, cancellationToken);
@@ -232,6 +246,15 @@ public sealed class DeleteStaffingAssignmentCommandHandler : IRequestHandler<Del
         var assignment = await _staffing.GetAssignmentByIdAsync(request.AssignmentId, cancellationToken)
             ?? throw new DomainException("assignment_not_found", "Không tìm thấy phân công.");
         var line = await _staffing.GetLineByIdAsync(assignment.StaffingLineId, cancellationToken);
+        if (line != null)
+        {
+            var plan = await _staffing.GetPlanByIdAsync(line.DailyStaffingPlanId, cancellationToken);
+            if (plan?.IsLocked == true)
+            {
+                throw new DomainException("plan_locked", "Ngày đã phát hành, không thể xóa phân công.");
+            }
+        }
+
         await _staffing.RemoveAssignmentAsync(assignment, cancellationToken);
         await _staffing.SaveChangesAsync(cancellationToken);
         if (line != null)
@@ -285,8 +308,23 @@ public sealed class ConfirmStaffingDayCommandHandler : IRequestHandler<ConfirmSt
         var dept = (request.DepartmentCode ?? "PVHK_DI").Trim().ToUpperInvariant();
         var plan = await _staffing.GetPlanAsync(week.SiteId, week.WeekId, request.DayIdx, dept, cancellationToken)
             ?? throw new DomainException("plan_not_found", "Chưa có kế hoạch phân công ngày.");
+        if (plan.IsLocked)
+        {
+            throw new DomainException("plan_locked", "Ngày đã phát hành.");
+        }
+
         var lines = await _staffing.ListLinesAsync(plan.Id, cancellationToken);
-        var assignments = await _staffing.ListAssignmentsForPlanAsync(plan.Id, cancellationToken);
+        var assignments = (await _staffing.ListAssignmentsForPlanAsync(plan.Id, cancellationToken)).ToList();
+        if (assignments.Count == 0)
+        {
+            var proposals = await _staffing.ListProposalsForPlanAsync(plan.Id, cancellationToken);
+            if (proposals.Count > 0)
+            {
+                assignments = StaffingWorkflowHelpers.CopyProposalsToAssignments(proposals, _clock.UtcNow);
+                await _staffing.ReplaceAssignmentsForPlanAsync(plan.Id, assignments, cancellationToken);
+            }
+        }
+
         var flightsById = new Dictionary<Guid, Flight>();
         foreach (var line in lines)
         {
@@ -424,7 +462,10 @@ public sealed class ExportStaffingDayQueryHandler : IRequestHandler<ExportStaffi
             cancellationToken);
         var label = week.GetWeekDates().ElementAtOrDefault(request.DayIdx) ?? $"Day {request.DayIdx + 1}";
         var year = int.TryParse(request.WeekId.Split('-')[0], out var y) ? y : DateTime.UtcNow.Year;
-        return _exporter.Export(new PvhkExportRequest { Day = day, DayLabel = label, CalendarYear = year });
+        var bio = await _sender.Send(
+            new GetStaffingBioHeaderQuery(request.WeekId, request.DayIdx, request.DepartmentCode),
+            cancellationToken);
+        return _exporter.Export(new PvhkExportRequest { Day = day, DayLabel = label, CalendarYear = year, Bio = bio });
     }
 }
 
@@ -456,7 +497,10 @@ public sealed class ExportStaffingWeekQueryHandler : IRequestHandler<ExportStaff
                 new GetStaffingDayQuery(request.WeekId, dayIdx, request.DepartmentCode),
                 cancellationToken);
             var label = dates.ElementAtOrDefault(dayIdx) ?? $"Day {dayIdx + 1}";
-            dayRequests.Add(new PvhkExportRequest { Day = day, DayLabel = label, CalendarYear = year });
+            var bio = await _sender.Send(
+                new GetStaffingBioHeaderQuery(request.WeekId, dayIdx, request.DepartmentCode),
+                cancellationToken);
+            dayRequests.Add(new PvhkExportRequest { Day = day, DayLabel = label, CalendarYear = year, Bio = bio });
         }
 
         return _exporter.ExportWeek(new PvhkWeekExportRequest { Days = dayRequests });

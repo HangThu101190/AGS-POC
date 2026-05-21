@@ -92,6 +92,62 @@ public sealed class StaffingController : ControllerBase
         return NoContent();
     }
 
+    [HttpPost("days/{weekId}/{dayIdx:int}/auto-assign")]
+    [Authorize(Policy = SmartShiftRoles.PolicyStaffingAssign)]
+    public async Task<IActionResult> AutoAssign(
+        string weekId,
+        int dayIdx,
+        [FromQuery] string? departmentCode,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(
+            new AutoAssignStaffingDayCommand(weekId, dayIdx, departmentCode),
+            cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("days/{weekId}/{dayIdx:int}/publish")]
+    [Authorize(Policy = SmartShiftRoles.PolicyStaffingAssign)]
+    public async Task<IActionResult> Publish(
+        string weekId,
+        int dayIdx,
+        [FromQuery] string? departmentCode,
+        [FromBody] PublishStaffingDayDto? body,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(
+            new PublishStaffingDayCommand(weekId, dayIdx, departmentCode, body),
+            cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("days/{weekId}/{dayIdx:int}/bio-header")]
+    [Authorize(Policy = SmartShiftRoles.PolicyStaffingView)]
+    public async Task<IActionResult> GetBioHeader(
+        string weekId,
+        int dayIdx,
+        [FromQuery] string? departmentCode,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GetStaffingBioHeaderQuery(weekId, dayIdx, departmentCode), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPut("days/{weekId}/{dayIdx:int}/bio-header")]
+    [Authorize(Policy = SmartShiftRoles.PolicyStaffingAssign)]
+    public async Task<IActionResult> PutBioHeader(
+        string weekId,
+        int dayIdx,
+        [FromQuery] string? departmentCode,
+        [FromBody] UpsertStaffingBioHeaderDto body,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(
+            new UpsertStaffingBioHeaderCommand(weekId, dayIdx, departmentCode, body),
+            cancellationToken);
+        return Ok(result);
+    }
+
     [HttpPost("days/{weekId}/{dayIdx:int}/confirm")]
     [Authorize(Policy = SmartShiftRoles.PolicyStaffingAssign)]
     public async Task<IActionResult> Confirm(

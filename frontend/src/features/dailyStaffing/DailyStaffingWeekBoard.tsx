@@ -2,15 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
-import Tooltip from "@mui/material/Tooltip";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import type { EventContentArg, SlotLabelContentArg, SlotLaneContentArg } from "@fullcalendar/core";
 import { useTranslation } from "react-i18next";
 import { Alert, Loading } from "@/components/ui";
-import weekPickerStyles from "@/features/planning/weekPicker.module.css";
-import { WeekPicker } from "@/features/planning/WeekPicker";
 import {
   computeHourSlotStats,
   defaultWorkWindowForLineHour,
@@ -26,7 +23,6 @@ import { resolveStaffingDepartmentCode } from "@/shared/planning/staffingDepartm
 import {
   createStaffingAssignment,
   deleteStaffingAssignment,
-  exportStaffingWeek,
   fetchStaffingDay,
   fetchStaffingRoster,
   type StaffingDay,
@@ -38,7 +34,6 @@ import { useAuth } from "@/shared/auth/AuthContext";
 type Props = {
   canEditManning: boolean;
   canAssign: boolean;
-  canExport: boolean;
 };
 
 const DAY_INDICES = [0, 1, 2, 3, 4, 5, 6] as const;
@@ -49,7 +44,7 @@ function scheduleRootUnmount(root: Root) {
   queueMicrotask(() => root.unmount());
 }
 
-export function DailyStaffingWeekBoard({ canAssign, canExport }: Props) {
+export function DailyStaffingWeekBoard({ canAssign }: Props) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { weekId, weekMeta } = useWeekScope();
@@ -244,16 +239,6 @@ export function DailyStaffingWeekBoard({ canAssign, canExport }: Props) {
     hourSlotMountsRef.current.forEach((mount) => renderHourSlotCard(mount));
   }, [renderHourSlotCard]);
 
-  const onExportWeek = useCallback(async () => {
-    const blob = await exportStaffingWeek(weekId, dept);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `PVHK_Di_${weekId}.xlsx`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [weekId, dept]);
-
   const renderEventContent = useCallback(
     (arg: EventContentArg) => {
       const kind = arg.event.extendedProps.kind as string | undefined;
@@ -335,34 +320,12 @@ export function DailyStaffingWeekBoard({ canAssign, canExport }: Props) {
         gap: 1,
       }}
     >
-      <Box sx={{ display: "inline-flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-        <WeekPicker compact inRow />
-        {canExport ? (
-          <Tooltip title={t("staffing.exportWeek")} arrow placement="bottom">
-            <span>
-              <button
-                type="button"
-                disabled={isLoading}
-                onClick={() => void onExportWeek()}
-                aria-label={t("staffing.exportWeek")}
-                className={weekPickerStyles.navBtn}
-              >
-                <svg width={18} height={18} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                </svg>
-              </button>
-            </span>
-          </Tooltip>
-        ) : null}
-      </Box>
-
       {saveError ? (
         <Alert severity="warning" onClose={() => setSaveError(null)}>
           {saveError}
         </Alert>
       ) : null}
 
-      {isLoading ? <Loading label={t("common.loading")} /> : null}
       {loadError ? (
         <Alert severity="error" onClose={invalidateWeek}>
           {t("common.error")}
@@ -371,8 +334,24 @@ export function DailyStaffingWeekBoard({ canAssign, canExport }: Props) {
 
       <Box
         className={calendarStyles.shell}
-        sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}
+        sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", position: "relative" }}
       >
+        {isLoading ? (
+          <Box
+            sx={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bgcolor: "rgba(255,255,255,0.72)",
+              borderRadius: "12px",
+            }}
+          >
+            <Loading label={t("common.loading")} />
+          </Box>
+        ) : null}
         <FullCalendar
           ref={calendarRef}
           key={weekId}

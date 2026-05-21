@@ -45,6 +45,10 @@ public sealed class SmartShiftDbContext : DbContext
     public DbSet<LeaveRequest> LeaveRequests => Set<LeaveRequest>();
     public DbSet<FlightImportJob> FlightImportJobs => Set<FlightImportJob>();
     public DbSet<ShiftCheckInPolicy> ShiftCheckInPolicies => Set<ShiftCheckInPolicy>();
+    public DbSet<ShiftTemplate> ShiftTemplates => Set<ShiftTemplate>();
+    public DbSet<EmployeeQualification> EmployeeQualifications => Set<EmployeeQualification>();
+    public DbSet<StaffingCrewProposal> StaffingCrewProposals => Set<StaffingCrewProposal>();
+    public DbSet<DailyStaffingBioHeader> DailyStaffingBioHeaders => Set<DailyStaffingBioHeader>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

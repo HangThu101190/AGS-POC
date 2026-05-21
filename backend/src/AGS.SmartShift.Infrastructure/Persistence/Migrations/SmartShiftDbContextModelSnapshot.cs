@@ -398,6 +398,11 @@ namespace AGS.SmartShift.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("DefaultSegment")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("default_segment");
+
                     b.Property<Guid>("DepartmentId")
                         .HasColumnType("uuid")
                         .HasColumnName("department_id");
@@ -410,11 +415,23 @@ namespace AGS.SmartShift.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("manager_id");
 
+                    b.Property<decimal>("MaxWeeklyHours")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(4, 1)
+                        .HasColumnType("numeric(4,1)")
+                        .HasDefaultValue(48m)
+                        .HasColumnName("max_weekly_hours");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)")
                         .HasColumnName("name");
+
+                    b.Property<string>("PreferredShiftCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("preferred_shift_code");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -889,6 +906,58 @@ namespace AGS.SmartShift.Infrastructure.Persistence.Migrations
                     b.ToTable("airline_manning_rules", (string)null);
                 });
 
+            modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.DailyStaffingBioHeader", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AssignerEmployeeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assigner_employee_id");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("DailyStaffingPlanId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("daily_staffing_plan_id");
+
+                    b.Property<Guid?>("EveningSupEmployeeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("evening_sup_employee_id");
+
+                    b.Property<Guid?>("MorningSupEmployeeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("morning_sup_employee_id");
+
+                    b.Property<string>("RadioNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("radio_note");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("row_version");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_daily_staffing_bio_headers");
+
+                    b.HasIndex("DailyStaffingPlanId")
+                        .IsUnique()
+                        .HasDatabaseName("uq_daily_staffing_bio_headers_plan_id");
+
+                    b.ToTable("daily_staffing_bio_headers", (string)null);
+                });
+
             modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.DailyStaffingLine", b =>
                 {
                     b.Property<Guid>("Id")
@@ -975,6 +1044,19 @@ namespace AGS.SmartShift.Infrastructure.Persistence.Migrations
                     b.Property<string>("HeaderJson")
                         .HasColumnType("jsonb")
                         .HasColumnName("header_json");
+
+                    b.Property<string>("LockReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("lock_reason");
+
+                    b.Property<DateTime?>("PublishedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("published_at");
+
+                    b.Property<Guid?>("PublishedByEmployeeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("published_by");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -1065,6 +1147,57 @@ namespace AGS.SmartShift.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ix_employee_day_availabilities_week_id_day_idx_employee_id");
 
                     b.ToTable("employee_day_availabilities", (string)null);
+                });
+
+            modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.EmployeeQualification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CrewRole")
+                        .HasColumnType("integer")
+                        .HasColumnName("crew_role");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("employee_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<int>("Proficiency")
+                        .HasColumnType("integer")
+                        .HasColumnName("proficiency");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("row_version");
+
+                    b.Property<int>("Segment")
+                        .HasColumnType("integer")
+                        .HasColumnName("segment");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_employee_qualifications");
+
+                    b.HasIndex("EmployeeId", "Segment", "CrewRole")
+                        .IsUnique()
+                        .HasDatabaseName("uq_employee_qualifications_emp_segment_role");
+
+                    b.ToTable("employee_qualifications", (string)null);
                 });
 
             modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.Flight", b =>
@@ -1760,6 +1893,166 @@ namespace AGS.SmartShift.Infrastructure.Persistence.Migrations
                     b.ToTable("shift_sync_proposals", (string)null);
                 });
 
+            modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.ShiftTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DepartmentCode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("department_code");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("end_time");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsOvernight")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_overnight");
+
+                    b.Property<decimal>("MaxHours")
+                        .HasPrecision(4, 1)
+                        .HasColumnType("numeric(4,1)")
+                        .HasColumnName("max_hours");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("row_version");
+
+                    b.Property<int?>("Segment")
+                        .HasColumnType("integer")
+                        .HasColumnName("segment");
+
+                    b.Property<Guid>("SiteId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("site_id");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("start_time");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_shift_templates");
+
+                    b.HasIndex("SiteId", "DepartmentCode", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("uq_shift_templates_site_dept_code");
+
+                    b.ToTable("shift_templates", (string)null);
+                });
+
+            modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.StaffingCrewProposal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CrewRole")
+                        .HasColumnType("integer")
+                        .HasColumnName("crew_role");
+
+                    b.Property<Guid>("DailyStaffingPlanId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("daily_staffing_plan_id");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("employee_id");
+
+                    b.Property<bool>("IsAutoAssigned")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_auto_assigned");
+
+                    b.Property<bool>("IsOvertime")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_overtime");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("note");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("row_version");
+
+                    b.Property<Guid?>("ShiftTemplateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shift_template_id");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.Property<Guid>("StaffingLineId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("staffing_line_id");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<TimeOnly>("WorkEnd")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("work_end");
+
+                    b.Property<TimeOnly>("WorkStart")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("work_start");
+
+                    b.HasKey("Id")
+                        .HasName("pk_staffing_crew_proposals");
+
+                    b.HasIndex("DailyStaffingPlanId")
+                        .HasDatabaseName("ix_staffing_crew_proposals_plan_id");
+
+                    b.HasIndex("StaffingLineId")
+                        .HasDatabaseName("ix_staffing_crew_proposals_staffing_line_id");
+
+                    b.ToTable("staffing_crew_proposals", (string)null);
+                });
+
             modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.WeeklyPlan", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1881,6 +2174,16 @@ namespace AGS.SmartShift.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_leave_requests_leave_types_leave_type_id");
                 });
 
+            modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.DailyStaffingBioHeader", b =>
+                {
+                    b.HasOne("AGS.SmartShift.Domain.Entities.Planning.DailyStaffingPlan", null)
+                        .WithMany()
+                        .HasForeignKey("DailyStaffingPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_daily_staffing_bio_headers_daily_staffing_plans_daily_staff");
+                });
+
             modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.DailyStaffingLine", b =>
                 {
                     b.HasOne("AGS.SmartShift.Domain.Entities.Planning.DailyStaffingPlan", null)
@@ -1916,6 +2219,23 @@ namespace AGS.SmartShift.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_shift_slots_weekly_plans_weekly_plan_id");
+                });
+
+            modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.StaffingCrewProposal", b =>
+                {
+                    b.HasOne("AGS.SmartShift.Domain.Entities.Planning.DailyStaffingPlan", null)
+                        .WithMany()
+                        .HasForeignKey("DailyStaffingPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_staffing_crew_proposals_daily_staffing_plans_daily_staffing");
+
+                    b.HasOne("AGS.SmartShift.Domain.Entities.Planning.DailyStaffingLine", null)
+                        .WithMany()
+                        .HasForeignKey("StaffingLineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_staffing_crew_proposals_daily_staffing_lines_staffing_line_");
                 });
 
             modelBuilder.Entity("AGS.SmartShift.Domain.Entities.Planning.WeeklyPlan", b =>

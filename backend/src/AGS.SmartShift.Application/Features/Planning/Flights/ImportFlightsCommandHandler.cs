@@ -53,7 +53,13 @@ public sealed class ImportFlightsCommandHandler : IRequestHandler<ImportFlightsC
         var dayIdx = request.DayIdx ?? plan.TodayIdx;
 
         PastDayGuard.EnsureMutableDay(dayIdx, plan.TodayIdx, "import lịch bay");
-        await FlightScheduleGuard.EnsureMutableAsync(_schedules, plan.WeekId, "import lịch bay", cancellationToken);
+        await FlightScheduleGuard.EnsureMutableForDayAsync(
+            _schedules,
+            plan.WeekId,
+            dayIdx,
+            plan.TodayIdx,
+            "import lịch bay",
+            cancellationToken);
         await _schedules.GetOrCreateForUpdateAsync(plan.SiteId, plan.WeekId, _clock.UtcNow, cancellationToken);
 
         var entities = parsed.Rows.Select(row =>

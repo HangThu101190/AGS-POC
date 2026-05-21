@@ -1,10 +1,13 @@
 # --- Root (local / agent / compose) ---
 .claude/
+.cursor/
+.playwright-mcp/
 docs/
 e2e/
 ops/
 scripts/
-shared/
+# shared/
+reference-data/
 AGENTS.md
 README.md
 docker-compose.yml

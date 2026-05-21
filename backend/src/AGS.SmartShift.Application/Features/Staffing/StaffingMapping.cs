@@ -28,6 +28,10 @@ internal static class StaffingMapping
             Status = plan.Status,
             HeaderJson = plan.HeaderJson,
             ConfirmedAt = plan.ConfirmedAtUtc,
+            PublishedAt = plan.PublishedAtUtc,
+            PublishedByEmployeeId = plan.PublishedByEmployeeId,
+            LockReason = plan.LockReason,
+            IsLocked = plan.IsLocked,
         };
 
     public static StaffingLineDto ToLineDto(DailyStaffingLine line) =>

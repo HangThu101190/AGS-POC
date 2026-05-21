@@ -83,7 +83,7 @@ function QnTable({
                 <TableCell sx={{ fontWeight: 600 }}>{row.flightNo}</TableCell>
                 <TableCell>{row.dest}</TableCell>
                 <TableCell>{row.aircraft}</TableCell>
-                <TableCell>{row.std}</TableCell>
+                <TableCell>{row.etd}</TableCell>
                 <TableCell sx={{ color: row.counter ? "text.primary" : "text.disabled" }}>
                   {row.counter || "—"}
                 </TableCell>
@@ -146,7 +146,7 @@ function QtTable({
               <TableCell>{row.stt}</TableCell>
               <TableCell sx={{ fontWeight: 600 }}>{row.flightNo}</TableCell>
               <TableCell>{row.dest}</TableCell>
-              <TableCell>{row.std}</TableCell>
+              <TableCell>{row.etd}</TableCell>
             </TableRow>
           ))
         )}

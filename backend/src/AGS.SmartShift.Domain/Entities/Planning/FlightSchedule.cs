@@ -1,5 +1,6 @@
 using AGS.SmartShift.Domain.Common;
 using AGS.SmartShift.Domain.Enums;
+using AGS.SmartShift.Domain.Planning;
 
 namespace AGS.SmartShift.Domain.Entities.Planning;
 
@@ -31,14 +32,32 @@ public sealed class FlightSchedule : AuditableEntity<Guid>
 
     public bool IsLocked => Status == FlightScheduleStatus.Locked;
 
-    public void EnsureMutable(string actionLabel)
+    public void EnsureMutable(string actionLabel, int todayIdx)
     {
-        if (IsLocked)
+        if (!IsLocked || !PastDayGuard.IsPastWeek(todayIdx))
         {
-            throw new DomainException(
-                "flight_schedule_locked",
-                $"Lịch bay tuần {WeekId} đã khóa — không thể {actionLabel}. Chỉ tạo revision / nhập delay.");
+            return;
         }
+
+        throw new DomainException(
+            "flight_schedule_locked",
+            $"Lịch bay tuần {WeekId} đã khóa — không thể {actionLabel}. Chỉ nhập delay trên tuần đã qua.");
+    }
+
+    /// <summary>
+    /// When locked, flight CRUD/import is blocked only for past ISO weeks.
+    /// Current and future weeks stay editable; past days within the current week are gated by <see cref="PastDayGuard"/>.
+    /// </summary>
+    public void EnsureMutableForDay(int dayIdx, int todayIdx, string actionLabel)
+    {
+        if (!IsLocked || !PastDayGuard.IsPastWeek(todayIdx))
+        {
+            return;
+        }
+
+        throw new DomainException(
+            "flight_schedule_locked",
+            $"Lịch bay tuần {WeekId} đã khóa — không thể {actionLabel}. Chỉ nhập delay trên tuần đã qua.");
     }
 
     public void PublishAndLock(DateTime utcNow)

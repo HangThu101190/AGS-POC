@@ -1,12 +1,13 @@
 # Build & run AGS SmartShift API (compose service: api)
-# Build context: repo root (see production/docker-compose.yml) so embedded
+# Build context: repo root (see docker-compose.yml) so embedded
 # reference-data/Kế_hoạch_bay.xlsx resolves like local dev.
 # TLS terminates at ingress/reverse proxy — container listens HTTP :8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0.411-bookworm-slim AS build
 WORKDIR /repo
-COPY production/backend/ ./production/backend/
+COPY backend/ ./backend/
+# Optional golden XLSX (see reference-data/README.md); empty dir is fine for compose dev
 COPY reference-data/ ./reference-data/
-WORKDIR /repo/production/backend
+WORKDIR /repo/backend
 RUN dotnet restore AGS.SmartShift.sln
 RUN dotnet publish src/AGS.SmartShift.Api/AGS.SmartShift.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
 

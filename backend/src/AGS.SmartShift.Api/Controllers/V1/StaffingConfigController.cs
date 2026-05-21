@@ -99,4 +99,53 @@ public sealed class StaffingConfigController : ControllerBase
         var result = await _sender.Send(new ListShiftCheckInPoliciesQuery(departmentCode), cancellationToken);
         return Ok(result);
     }
+
+    [HttpGet("shift-templates")]
+    [Authorize(Policy = SmartShiftRoles.PolicyHr)]
+    public async Task<IActionResult> ListShiftTemplates(
+        [FromQuery] string? departmentCode,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ListShiftTemplatesQuery(departmentCode), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("shift-templates")]
+    [Authorize(Policy = SmartShiftRoles.PolicyHr)]
+    public async Task<IActionResult> CreateShiftTemplate(
+        [FromBody] UpsertShiftTemplateDto body,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new UpsertShiftTemplateCommand(null, body), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPut("shift-templates/{id:guid}")]
+    [Authorize(Policy = SmartShiftRoles.PolicyHr)]
+    public async Task<IActionResult> UpdateShiftTemplate(
+        Guid id,
+        [FromBody] UpsertShiftTemplateDto body,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new UpsertShiftTemplateCommand(id, body), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpDelete("shift-templates/{id:guid}")]
+    [Authorize(Policy = SmartShiftRoles.PolicyHr)]
+    public async Task<IActionResult> DeleteShiftTemplate(Guid id, CancellationToken cancellationToken)
+    {
+        await _sender.Send(new DeleteShiftTemplateCommand(id), cancellationToken);
+        return NoContent();
+    }
+
+    [HttpGet("employee-qualifications")]
+    [Authorize(Policy = SmartShiftRoles.PolicyHr)]
+    public async Task<IActionResult> ListEmployeeQualifications(
+        [FromQuery] string departmentCode,
+        CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new ListEmployeeQualificationsQuery(departmentCode), cancellationToken);
+        return Ok(result);
+    }
 }

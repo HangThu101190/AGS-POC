@@ -711,20 +711,6 @@ paths:
       responses:
         '204':
           description: Removed
-  /api/v1/attendance/my-shift:
-    get:
-      summary: Staff today shift (segments + flights for current user)
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: weekId
-          in: query
-          schema: { type: string }
-      responses:
-        '200':
-          description: Staff shift for today
-        '403':
-          description: Staff account required
   /api/v1/attendance/{employeeId}:
     get:
       summary: Attendance by employee (self or same-dept Sup / HR)
@@ -906,6 +892,60 @@ paths:
       responses:
         '200':
           description: Roster entries
+  /api/v1/staffing/days/{weekId}/{dayIdx}/auto-assign:
+    post:
+      summary: Auto-assign crew proposals (shift leader)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Auto-assign result with proposals and warnings
+  /api/v1/staffing/days/{weekId}/{dayIdx}/publish:
+    post:
+      summary: Publish and lock staffing day (push to staff)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lockReason: { type: string, nullable: true }
+      responses:
+        '200':
+          description: Published
+  /api/v1/staffing/days/{weekId}/{dayIdx}/bio-header:
+    get:
+      summary: BIO header for staffing day
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: BIO header
+    put:
+      summary: Update BIO header
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Updated BIO header
   /api/v1/staffing/assignments:
     post:
       summary: Create flight crew assignment on staffing line
@@ -1021,6 +1061,62 @@ paths:
       responses:
         '200':
           description: Policies
+  /api/v1/staffing/config/shift-templates:
+    get:
+      summary: List shift templates (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Shift templates
+    post:
+      summary: Create shift template (HR)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Created
+  /api/v1/staffing/config/shift-templates/{id}:
+    put:
+      summary: Update shift template (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Updated
+    delete:
+      summary: Deactivate shift template (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '204':
+          description: Deactivated
+  /api/v1/staffing/config/employee-qualifications:
+    get:
+      summary: List employee qualifications by department (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: departmentCode, in: query, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Qualifications
+  /api/v1/employees/{id}/qualifications:
+    put:
+      summary: Bulk upsert employee qualifications (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Updated qualifications
   /api/v1/leave/types:
     get:
       summary: Leave type catalog

@@ -21,10 +21,15 @@ export function inferSegmentFromFlight(
   return "Qn";
 }
 
+/** API serializes OperationalSegment as camelCase enum: `"qn"` | `"qt"`. */
 export function isQnSegment(segment: string | number): boolean {
-  return segment === "Qn" || segment === 0;
+  if (segment === 0 || segment === "0") return true;
+  const s = String(segment).toLowerCase();
+  return s === "qn";
 }
 
 export function isQtSegment(segment: string | number): boolean {
-  return segment === "Qt" || segment === 1;
+  if (segment === 1 || segment === "1") return true;
+  const s = String(segment).toLowerCase();
+  return s === "qt";
 }

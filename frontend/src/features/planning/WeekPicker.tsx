@@ -34,7 +34,7 @@ type WeekPickerProps = {
 
 export function WeekPicker({ compact = false, inline = false, inRow = false, className }: WeekPickerProps) {
   const { t } = useTranslation();
-  const { weekId, weekMeta, setWeekId } = useWeekScope();
+  const { weekId, weekMeta, setWeekId, planLoading } = useWeekScope();
   const [open, setOpen] = useState(false);
   const [panelStyle, setPanelStyle] = useState<CSSProperties | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -186,6 +186,7 @@ export function WeekPicker({ compact = false, inline = false, inRow = false, cla
     inline ? styles.inline : "",
     compact ? styles.compact : "",
     inRow ? styles.inRow : "",
+    planLoading ? styles.weekBusy : "",
     className,
   ]
     .filter(Boolean)

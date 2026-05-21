@@ -1,0 +1,55 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Row 2 — align with WeekPicker .bar.inline (32px controls + 4px padding) */
+.toolbarRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 10px;
+  min-height: 40px;
+}
+
+.toolbarWeek {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.toolbarActions {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+  min-height: 32px;
+}
+
+/* Match FlightsPage .actionBtn footprint; fixed 32px like WeekPicker .navBtn */
+.toolbarBtn {
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  box-sizing: border-box;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.toolbarBtn.primary,
+.toolbarBtnPrimary {
+  padding: 0 12px !important;
+}

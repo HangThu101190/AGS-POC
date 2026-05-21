@@ -12,6 +12,9 @@ public sealed class DailyStaffingPlan : AuditableEntity<Guid>
     public DailyStaffingPlanStatus Status { get; private set; }
     public string? HeaderJson { get; private set; }
     public DateTime? ConfirmedAtUtc { get; private set; }
+    public DateTime? PublishedAtUtc { get; private set; }
+    public Guid? PublishedByEmployeeId { get; private set; }
+    public string? LockReason { get; private set; }
 
     private DailyStaffingPlan()
     {
@@ -49,6 +52,17 @@ public sealed class DailyStaffingPlan : AuditableEntity<Guid>
 
         MarkUpdated(utcNow);
     }
+
+    public void Publish(Guid publishedByEmployeeId, string? lockReason, DateTime utcNow)
+    {
+        Status = DailyStaffingPlanStatus.Published;
+        PublishedAtUtc = utcNow;
+        PublishedByEmployeeId = publishedByEmployeeId;
+        LockReason = lockReason;
+        MarkUpdated(utcNow);
+    }
+
+    public bool IsLocked => Status == DailyStaffingPlanStatus.Published;
 
     public void UpdateHeaderJson(string? headerJson, DateTime utcNow)
     {
