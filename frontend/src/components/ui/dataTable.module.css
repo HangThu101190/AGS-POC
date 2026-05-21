@@ -1,0 +1,128 @@
+.wrapper {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wrapperFill {
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.rowCount {
+  font-size: var(--ags-font-size-caption, 0.75rem);
+  color: var(--ags-muted, #64748b);
+  white-space: nowrap;
+}
+
+.gridShell {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ags-border, #e2e8f0);
+  border-radius: var(--ags-radius, 8px);
+  overflow: hidden;
+  background: var(--ags-surface, #fff);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
+}
+
+.gridInner {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gridInitialLoading .gridInner {
+  visibility: hidden;
+}
+
+.gridRefreshing .gridInner {
+  opacity: 0.88;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+@media (max-width: 899px) {
+  .gridShell {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .gridShell :global(.ag-root-wrapper) {
+    min-width: auto;
+  }
+}
+
+.gridShell :global(.ag-root-wrapper) {
+  flex: 1;
+  min-height: 0;
+}
+
+.gridShell :global(.ag-header-cell-label) {
+  justify-content: center;
+  width: 100%;
+}
+
+.gridShell :global(.ag-header-cell-text) {
+  font-weight: 700;
+}
+
+/* Excel-style filter funnel on header (not floating row) */
+.gridShell :global(.ag-header-cell-filter-button) {
+  opacity: 1;
+}
+
+.gridShell :global(.ag-header-cell-filter-button:not(.ag-filter-active)) {
+  opacity: 0.55;
+}
+
+.gridShell :global(.ag-header-cell-filter-button.ag-filter-active) {
+  color: var(--ags-primary, #033b7d);
+  opacity: 1;
+}
+
+.gridShell :global(.ag-cell) {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  line-height: 1.35;
+}
+
+.gridShell :global(.ag-cell-wrapper) {
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+}
+
+.gridShell :global(.ag-cell-value) {
+  overflow: hidden;
+  min-width: 0;
+  width: 100%;
+}
+
+/* Resize on column border line — hide default grip icon */
+.gridShell :global(.ag-header-cell-resize) {
+  opacity: 0;
+  width: 6px;
+  right: -3px;
+  z-index: 1;
+}
+
+.gridShell :global(.ag-header-cell-resize::after) {
+  display: none;
+}

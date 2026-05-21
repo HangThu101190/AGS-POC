@@ -1,0 +1,1275 @@
+openapi: 3.0.3
+info:
+  title: AGS SmartShift API
+  version: v1
+  description: Sprint 1+ stub — regenerate FE types with `npm run codegen:api` in production/frontend.
+paths:
+  /health:
+    get:
+      summary: Liveness — PostgreSQL + EF
+  /ready:
+    get:
+      summary: Readiness — PostgreSQL + EF migrated (K8s / compose)
+  /api/v1/health:
+    get:
+      summary: Application health metadata
+  /api/v1/auth/login:
+    post:
+      summary: Login (employee code + password)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, password]
+              properties:
+                login: { type: string }
+                password: { type: string, format: password }
+  /api/v1/auth/refresh:
+    post:
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+  /api/v1/auth/logout:
+    post:
+      summary: Revoke refresh token
+  /api/v1/auth/me:
+    get:
+      summary: Current user (Bearer)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUser'
+    patch:
+      summary: Update current user preferences
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preferredLanguage: { type: string, enum: [vi, en] }
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUser'
+  /api/v1/auth/me/change-password:
+    post:
+      summary: Change password for current user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword: { type: string, format: password }
+                newPassword: { type: string, format: password }
+      responses:
+        '204':
+          description: Password changed
+  /api/v1/roles/catalog:
+    get:
+      summary: Role and permission catalog
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Catalog
+  /api/v1/roles/catalog/permissions:
+    put:
+      summary: Replace role-permission grants (HR only; audited)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [roles]
+              properties:
+                roles:
+                  type: object
+                  additionalProperties:
+                    type: array
+                    items: { type: string }
+      responses:
+        '200':
+          description: Updated catalog
+        '403':
+          description: Forbidden
+  /api/v1/departments:
+    get:
+      summary: List departments (paged, server-side table)
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: sortBy
+          in: query
+          schema: { type: string }
+        - name: sortDir
+          in: query
+          schema: { type: string, enum: [asc, desc] }
+        - name: filters
+          in: query
+          description: AG Grid filterModel JSON
+          schema: { type: string }
+  /api/v1/flights:
+    get:
+      summary: List flights (paged; optional weekId, dayIdx, departmentCode)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: query
+          schema: { type: string }
+        - name: dayIdx
+          in: query
+          schema: { type: integer }
+        - name: departmentCode
+          in: query
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: Paged flight list
+    post:
+      summary: Create flight (TBĐH only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlightUpsert'
+      responses:
+        '200':
+          description: Created flight
+        '403':
+          description: Forbidden
+  /api/v1/flights/{id}:
+    put:
+      summary: Update flight (TBĐH only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlightUpsert'
+      responses:
+        '200':
+          description: Updated flight
+    delete:
+      summary: Delete flight (TBĐH only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204':
+          description: Deleted
+  /api/v1/flight-schedules/{weekId}:
+    get:
+      summary: Flight schedule status for week (TBĐH publish/lock)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Schedule draft or locked
+  /api/v1/flight-schedules/{weekId}/publish:
+    post:
+      summary: Publish and lock flight schedule for week (TBĐH only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Locked schedule
+  /api/v1/flights/day-meta:
+    get:
+      summary: Per-day flight plan metadata (sheet footer remark from Excel import)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: query
+          schema: { type: string }
+        - name: dayIdx
+          in: query
+          required: true
+          schema: { type: integer, minimum: 0, maximum: 6 }
+      responses:
+        '200':
+          description: Day metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightScheduleDay'
+        '404':
+          description: No import metadata for this day
+  /api/v1/flights/import:
+    post:
+      summary: Import flights from Excel (TBĐH only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: query
+          schema: { type: string }
+        - name: dayIdx
+          in: query
+          description: Week day index (0–6) from the active Lịch bay day filter; not inferred from Excel title rows.
+          schema: { type: integer, minimum: 0, maximum: 6 }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import result (importedCount, dayIdx, dayLabel, warnings)
+        '202':
+          description: Async import accepted (job id in body; poll GET /flights/import/jobs/{id})
+        '403':
+          description: Forbidden (non-HR)
+        '422':
+          description: Past day or validation error
+  /api/v1/flights/{id}/delay:
+    patch:
+      summary: Set flight delay minutes (TBĐH only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                delayMinutes: { type: integer, description: Legacy — sets both ETA and ETD delay }
+                etaDelayMinutes: { type: integer }
+                etdDelayMinutes: { type: integer }
+      responses:
+        '200':
+          description: Updated flight
+        '403':
+          description: Forbidden
+        '422':
+          description: Past day mutation blocked
+  /api/v1/plans/{weekId}:
+    get:
+      summary: Weekly plan (any authenticated; mutations HR only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Weekly plan with slots
+  /api/v1/plans/{weekId}/slots/generate:
+    post:
+      summary: Generate shift slots for today and future (Shift Leader only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Updated plan
+        '403':
+          description: Forbidden
+  /api/v1/plans/{weekId}/publish:
+    post:
+      summary: Publish weekly plan (Shift Leader only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Published plan
+  /api/v1/plans/{weekId}/reset:
+    post:
+      summary: Reset today+future slots (Shift Leader only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Reset plan
+  /api/v1/employees:
+    get:
+      summary: List employees (paged, server-side table)
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: sortBy
+          in: query
+          schema: { type: string }
+        - name: sortDir
+          in: query
+          schema: { type: string, enum: [asc, desc] }
+        - name: filters
+          in: query
+          description: AG Grid filterModel JSON
+          schema: { type: string }
+  /api/v1/audit-events:
+    get:
+      summary: List system audit log (HR only, paged)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: sortBy
+          in: query
+          schema: { type: string }
+        - name: sortDir
+          in: query
+          schema: { type: string, enum: [asc, desc] }
+        - name: filters
+          in: query
+          description: AG Grid filterModel JSON (employeeCode, path, httpMethod, statusCode)
+          schema: { type: string }
+        - name: fromUtc
+          in: query
+          schema: { type: string, format: date-time }
+        - name: toUtc
+          in: query
+          schema: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Paged audit events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedAuditEvents'
+        '403':
+          description: Forbidden (non-HR)
+  /api/v1/monitoring/snapshot:
+    get:
+      summary: Monitoring snapshot (HR only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: since
+          in: query
+          description: ISO-8601 UTC watermark; returns 304 when data unchanged
+          schema: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Snapshot with markers, stats, work zone
+        '304':
+          description: Unchanged since watermark
+        '403':
+          description: Forbidden (non-HR)
+  /api/v1/attendance/location-samples:
+    post:
+      summary: Batch GPS samples for active check-in (Staff)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [samples]
+              properties:
+                samples:
+                  type: array
+                  items:
+                    type: object
+                    required: [lat, lng]
+                    properties:
+                      lat: { type: number }
+                      lng: { type: number }
+                      capturedAtUtc: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Samples accepted
+        '400':
+          description: Not checked in or invalid batch
+        '403':
+          description: Forbidden (non-Staff)
+  /api/v1/sync-proposals:
+    get:
+      summary: List shift sync proposals after flight delay (Sup)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: query
+          schema: { type: string }
+        - name: pendingOnly
+          in: query
+          schema: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Sync proposal list
+        '403':
+          description: Forbidden (non-Sup)
+  /api/v1/sync-proposals/{id}/confirm:
+    post:
+      summary: Confirm sync — apply proposed segments + notify staff (Sup)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Confirmed proposal
+        '400':
+          description: Not pending
+        '403':
+          description: Forbidden
+  /api/v1/sync-proposals/{id}/dismiss:
+    post:
+      summary: Dismiss sync proposal (Sup)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Dismissed proposal
+  /api/v1/reconcile:
+    get:
+      summary: Reconcile summary — planned vs actual by employee/day (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: query
+          schema: { type: string }
+        - name: departmentCode
+          in: query
+          schema: { type: string, default: PVHK_DI }
+      responses:
+        '200':
+          description: Grouped reconcile summary
+        '403':
+          description: Forbidden (non-HR)
+  /api/v1/reconcile/export/week:
+    get:
+      summary: Export weekly TH CONG Excel (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: query
+          schema: { type: string }
+        - name: departmentCode
+          in: query
+          schema: { type: string, default: PVHK_DI }
+      responses:
+        '200':
+          description: XLSX file
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema: { type: string, format: binary }
+        '403':
+          description: Forbidden
+  /api/v1/reconcile/export/month:
+    get:
+      summary: Export monthly TH CONG Excel (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: query
+          schema: { type: string }
+        - name: departmentCode
+          in: query
+          schema: { type: string, default: PVHK_DI }
+        - name: monthLabel
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: XLSX file
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema: { type: string, format: binary }
+        '403':
+          description: Forbidden
+  /api/v1/attendance/my-shift:
+    get:
+      summary: Staff today shift + shift-changed banner flag
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: planStatus, segments, flightNos, shiftChanged
+        '403':
+          description: Forbidden (non-Staff)
+  /api/v1/notifications/me:
+    get:
+      summary: Inbox for current user (paged)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: Paged notifications
+  /api/v1/notifications/{id}/read:
+    patch:
+      summary: Mark notification read
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Updated notification
+  /api/v1/assignments:
+    post:
+      summary: Assign employee to slot (Shift Leader; dept scope)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [departmentId, slotId, employeeId]
+              properties:
+                weekId: { type: string }
+                departmentId: { type: string, format: uuid }
+                slotId: { type: string, format: uuid }
+                employeeId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Assignment created; plan may become in_progress
+        '403':
+          description: Forbidden (dept scope / role)
+  /api/v1/supboard:
+    get:
+      summary: Sup board slots and day flights (Shift Leader)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: query
+          schema: { type: string }
+        - name: dayIdx
+          in: query
+          schema: { type: integer }
+        - name: departmentCode
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Sup board payload
+        '403':
+          description: Forbidden
+  /api/v1/assignments/{assignmentId}/flights:
+    put:
+      summary: Link flight numbers to assignment (Shift Leader; overlap with slot segments)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: assignmentId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                weekId: { type: string }
+                flightNos:
+                  type: array
+                  items: { type: string }
+      responses:
+        '200':
+          description: Updated flight list on assignment
+        '403':
+          description: Forbidden
+        '422':
+          description: Past day or flight/slot mismatch
+  /api/v1/assignments/{assignmentId}:
+    delete:
+      summary: Remove assignment (Shift Leader)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: assignmentId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: weekId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '204':
+          description: Removed
+  /api/v1/attendance/{employeeId}:
+    get:
+      summary: Attendance by employee (self or same-dept Sup / HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Attendance record
+        '403':
+          description: Forbidden (IDOR)
+        '404':
+          description: Not found
+  /api/v1/attendance/check-in:
+    post:
+      summary: Staff geofence check-in (current user)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lat, lng, inZone, geoSimulated]
+              properties:
+                lat: { type: number, format: double }
+                lng: { type: number, format: double }
+                inZone: { type: boolean }
+                geoNote: { type: string, nullable: true }
+                geoSimulated: { type: boolean }
+      responses:
+        '200':
+          description: Active attendance record
+        '409':
+          description: Already checked in today
+        '403':
+          description: Forbidden
+  /api/v1/work-zones/active:
+    get:
+      summary: Active work zone polygon for site (default CXR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: siteId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Work zone with polygon vertices
+  /api/v1/work-zones/active/polygon:
+    put:
+      summary: Update active work zone polygon (HR)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [polygon]
+              properties:
+                polygon:
+                  type: array
+                  minItems: 3
+                  items:
+                    type: object
+                    required: [lat, lng]
+                    properties:
+                      lat: { type: number, format: double }
+                      lng: { type: number, format: double }
+      responses:
+        '200':
+          description: Updated work zone
+        '403':
+          description: Forbidden
+  /api/v1/attendance/check-out:
+    post:
+      summary: Staff check-out (optional early note)
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                earlyNote: { type: string, nullable: true }
+      responses:
+        '200':
+          description: Closed attendance record
+        '409':
+          description: Not checked in or already checked out
+        '403':
+          description: Forbidden
+  /api/v1/staffing/days/{weekId}/{dayIdx}:
+    get:
+      summary: Daily staffing board (PVHK) for a week day
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Staffing day payload
+  /api/v1/staffing/days/{weekId}/{dayIdx}/propose:
+    post:
+      summary: Propose manning from rules (TBĐH)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Updated staffing day
+  /api/v1/staffing/days/{weekId}/{dayIdx}/confirm:
+    post:
+      summary: Confirm assignments and sync ShiftSlot / ShiftAssignment
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Confirm result
+  /api/v1/staffing/weeks/{weekId}/export:
+    get:
+      summary: Export PVHK week assignment Excel (one sheet per day, template layout)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: XLSX workbook with 7 day sheets
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+  /api/v1/staffing/days/{weekId}/{dayIdx}/export:
+    get:
+      summary: Export PVHK daily assignment Excel
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: XLSX file
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+  /api/v1/staffing/days/{weekId}/{dayIdx}/roster:
+    get:
+      summary: Roster for daily staffing assignment
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Roster entries
+  /api/v1/staffing/days/{weekId}/{dayIdx}/auto-assign:
+    post:
+      summary: Auto-assign crew proposals (shift leader)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Auto-assign result with proposals and warnings
+  /api/v1/staffing/days/{weekId}/{dayIdx}/publish:
+    post:
+      summary: Publish and lock staffing day (push to staff)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lockReason: { type: string, nullable: true }
+      responses:
+        '200':
+          description: Published
+  /api/v1/staffing/days/{weekId}/{dayIdx}/bio-header:
+    get:
+      summary: BIO header for staffing day
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: BIO header
+    put:
+      summary: Update BIO header
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: weekId, in: path, required: true, schema: { type: string } }
+        - { name: dayIdx, in: path, required: true, schema: { type: integer } }
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Updated BIO header
+  /api/v1/staffing/assignments:
+    post:
+      summary: Create flight crew assignment on staffing line
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Assignment created
+  /api/v1/staffing/assignments/{id}:
+    patch:
+      summary: Update assignment work window (shift leader calendar)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Updated assignment
+    delete:
+      summary: Remove staffing assignment
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '204':
+          description: Deleted
+  /api/v1/staffing/lines/{id}:
+    patch:
+      summary: Patch target manning (TBĐH)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Updated line
+  /api/v1/staffing/config/aircraft-manning-rules:
+    get:
+      summary: List aircraft manning rules (HR)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Rules
+    post:
+      summary: Create aircraft manning rule (HR)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Created
+  /api/v1/staffing/config/aircraft-manning-rules/{id}:
+    put:
+      summary: Update aircraft manning rule (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Updated
+    delete:
+      summary: Deactivate aircraft manning rule (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '204':
+          description: Deactivated
+  /api/v1/staffing/config/airline-manning-rules:
+    get:
+      summary: List airline manning rules (HR)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Rules
+    post:
+      summary: Create airline manning rule (HR)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Created
+  /api/v1/staffing/config/airline-manning-rules/{id}:
+    put:
+      summary: Update airline manning rule (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Updated
+    delete:
+      summary: Deactivate airline manning rule (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '204':
+          description: Deactivated
+  /api/v1/staffing/config/shift-check-in-policies:
+    get:
+      summary: List shift check-in policies (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Policies
+  /api/v1/staffing/config/shift-templates:
+    get:
+      summary: List shift templates (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: departmentCode, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Shift templates
+    post:
+      summary: Create shift template (HR)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Created
+  /api/v1/staffing/config/shift-templates/{id}:
+    put:
+      summary: Update shift template (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Updated
+    delete:
+      summary: Deactivate shift template (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '204':
+          description: Deactivated
+  /api/v1/staffing/config/employee-qualifications:
+    get:
+      summary: List employee qualifications by department (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: departmentCode, in: query, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Qualifications
+  /api/v1/employees/{id}/qualifications:
+    put:
+      summary: Bulk upsert employee qualifications (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Updated qualifications
+  /api/v1/leave/types:
+    get:
+      summary: Leave type catalog
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Leave types
+  /api/v1/leave/requests:
+    get:
+      summary: List leave requests (HR)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Requests
+    post:
+      summary: Create leave request (staff)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Created
+  /api/v1/leave/requests/{id}/approve:
+    post:
+      summary: Approve leave request (HR)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Approved
+  /api/v1/flights/import/jobs/{id}:
+    get:
+      summary: Flight import job status (async import)
+      security:
+        - bearerAuth: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Job status
+        '404':
+          description: Not found
+components:
+  schemas:
+    AuditEvent:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        occurredAtUtc: { type: string, format: date-time }
+        employeeCode: { type: string, nullable: true }
+        actorName: { type: string, nullable: true }
+        httpMethod: { type: string }
+        path: { type: string }
+        statusCode: { type: integer }
+    PagedAuditEvents:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEvent'
+        page: { type: integer }
+        pageSize: { type: integer }
+        totalCount: { type: integer }
+    AuthUser:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        role: { type: string, enum: [hr, sup, staff, tbdh, shift_leader] }
+        departmentId: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        loginName: { type: string }
+        departmentCode: { type: string }
+        departmentName: { type: string }
+        preferredLanguage: { type: string, enum: [vi, en] }
+        mustChangePassword: { type: boolean }
+    Flight:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        weekId: { type: string }
+        dayIdx: { type: integer }
+        excelRowNo: { type: integer, description: Excel column NO }
+        sortOrder: { type: integer, description: Row order within day (B-tree list index) }
+        flightNo: { type: string, description: ARR FLT NO }
+        departureFlightNo: { type: string, description: DEP FLT NO }
+        registration: { type: string, description: REGS }
+        route: { type: string }
+        sta: { type: string }
+        std: { type: string }
+        eta: { type: string, nullable: true }
+        etd: { type: string, nullable: true }
+        etaDelayMinutes: { type: integer }
+        etdDelayMinutes: { type: integer }
+        delayMinutes: { type: integer }
+        isDelayed: { type: boolean }
+        belt: { type: string, description: BELT ARR }
+        parking: { type: string, description: PRK }
+        gate: { type: string }
+        remark: { type: string }
+        aircraft: { type: string }
+        carry: { type: string }
+        departmentCode: { type: string }
+        manning: { type: integer }
+        manningExplain: { type: string, nullable: true }
+        isVip: { type: boolean }
+    FlightScheduleDay:
+      type: object
+      properties:
+        weekId: { type: string }
+        dayIdx: { type: integer }
+        sourceDayLabel: { type: string, nullable: true }
+        sheetRemark: { type: string, nullable: true, description: Footer Remark block from Excel }
+    FlightImportResult:
+      type: object
+      properties:
+        importedCount: { type: integer }
+        dayIdx: { type: integer }
+        dayLabel: { type: string, nullable: true }
+        sheetRemark: { type: string, nullable: true }
+        warnings:
+          type: array
+          items: { type: string }
+    FlightUpsert:
+      type: object
+      required: [dayIdx, flightNo, route, sta, std, departmentCode]
+      properties:
+        weekId: { type: string }
+        dayIdx: { type: integer }
+        flightNo: { type: string }
+        departureFlightNo: { type: string }
+        registration: { type: string }
+        route: { type: string }
+        sta: { type: string }
+        std: { type: string }
+        eta: { type: string }
+        etd: { type: string }
+        departmentCode: { type: string }
+        manning: { type: integer }
+        aircraft: { type: string }
+        carry: { type: string }
+        gate: { type: string }
+        belt: { type: string }
+        parking: { type: string }
+        remark: { type: string }
+        isVip: { type: boolean }
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

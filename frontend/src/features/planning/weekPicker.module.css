@@ -1,0 +1,452 @@
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--ags-border, #e2e8f0);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+/* Header chip — width fits content, sits beside page title */
+.bar.inline {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  width: auto;
+  max-width: 100%;
+  margin-bottom: 0;
+  padding: 4px;
+  gap: 4px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.bar.inline .main {
+  flex: 0 1 auto;
+  min-width: 0;
+  width: auto;
+}
+
+.bar.inline .navBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+}
+
+.bar.inline .navBtn:hover:not(:disabled) {
+  background: rgba(3, 59, 125, 0.08);
+}
+
+.bar.inline .trigger {
+  padding: 6px 10px;
+  border-radius: 999px;
+  gap: 8px;
+}
+
+.bar.inline .range {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.bar.inline .weekId {
+  display: none;
+}
+
+.bar.inline .badge {
+  padding: 2px 7px;
+  font-size: 10px;
+}
+
+.navBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #033b7d;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: rgba(3, 59, 125, 0.06);
+  border-color: #cbd5e1;
+}
+
+.navBtn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.navBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.main {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.trigger:hover,
+.triggerOpen {
+  background: rgba(3, 59, 125, 0.05);
+  border-color: #e2e8f0;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid #033b7d;
+  outline-offset: 2px;
+}
+
+.range {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.rangePast {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.rangeCurrent {
+  color: #033b7d;
+  font-weight: 600;
+}
+
+.rangeFuture {
+  color: #047857;
+  font-weight: 600;
+}
+
+.weekId {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.chevron {
+  margin-left: auto;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badgePast {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.badgeCurrent {
+  background: rgba(3, 59, 125, 0.1);
+  color: #033b7d;
+}
+
+.badgeFuture {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.panel {
+  width: max-content;
+  max-width: min(92vw, 400px);
+  max-height: min(70vh, 420px);
+  overflow: auto;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow:
+    0 10px 40px rgba(15, 23, 42, 0.12),
+    0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  margin: 8px 4px 6px;
+}
+
+.sectionTitle:first-child {
+  margin-top: 0;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.optionText {
+  flex: 1;
+  min-width: 0;
+}
+
+.option:hover {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.optionSelected {
+  background: rgba(3, 59, 125, 0.08);
+  border-color: rgba(3, 59, 125, 0.25);
+}
+
+.optionRange {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.optionMeta {
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.option .badge {
+  flex-shrink: 0;
+}
+
+.todayBtn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  color: #033b7d;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.todayBtn:hover {
+  background: rgba(3, 59, 125, 0.06);
+}
+
+.bar.compact {
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+
+/* Flights toolbar row — same height/radius as day chips (6px, ~32px) */
+.bar.inline.inRow {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 0;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: none;
+  overflow: hidden;
+  height: 32px;
+  box-sizing: border-box;
+}
+
+.bar.inline.inRow .navBtn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 32px;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: #fff;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.bar.inline.inRow .navBtn:hover:not(:disabled) {
+  background: rgba(3, 59, 125, 0.06);
+}
+
+.bar.inline.inRow .main {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.bar.inline.inRow .trigger {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  gap: 6px;
+  border: none;
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  border-radius: 0;
+  background: #fff;
+}
+
+.bar.inline.inRow .trigger:hover,
+.bar.inline.inRow .triggerOpen {
+  background: rgba(3, 59, 125, 0.05);
+  border-color: #e2e8f0;
+}
+
+.bar.inline.inRow .range {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.bar.inline.inRow .badge {
+  padding: 2px 6px;
+  font-size: 10px;
+  border-radius: 4px;
+}
+
+.bar.inline.inRow .chevron {
+  margin-left: 2px;
+  font-size: 10px;
+}
+
+.bar.inline.inRow .range,
+.bar.inline.inRow .badge {
+  transition: opacity 0.15s ease;
+}
+
+.bar.inline.inRow.weekBusy .range {
+  opacity: 0.55;
+}
+
+
+/* Used with .bar.compact on staffing board week row */
+.bar.compact.inRow {
+  margin-bottom: 0;
+  flex-shrink: 0;
+  padding: 0 4px;
+  gap: 6px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: none;
+  align-items: center;
+}
+
+.bar.compact.inRow .main {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: visible;
+}
+
+.bar.compact.inRow .navBtn {
+  position: relative;
+  z-index: 45;
+  flex-shrink: 0;
+  width: auto;
+  min-width: 36px;
+  height: auto;
+  min-height: 36px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.bar.compact.inRow .trigger {
+  padding: 8px 12px;
+  border-radius: 6px;
+  gap: 8px;
+  align-items: center;
+}
+
+.bar.compact.inRow .range {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.bar.compact.inRow .weekId {
+  display: none;
+}
+
+.bar.compact.inRow .badge {
+  padding: 2px 7px;
+  font-size: 11px;
+}
+
+.bar.compact.inRow .chevron {
+  margin-left: 0;
+  font-size: 10px;
+}
+
+.bar.compact.inRow .todayBtn {
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.bar.compact .navBtn {
+  width: 32px;
+  height: 32px;
+}
+
+.bar.compact:not(.inRow) .range {
+  font-size: 14px;
+}
+
+.bar.compact:not(.inRow) .weekId {
+  display: none;
+}

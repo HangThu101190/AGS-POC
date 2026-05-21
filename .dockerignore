@@ -1,0 +1,30 @@
+# docker-compose api build context (repo root)
+.git
+.cursor
+.claude
+docs
+e2e
+ops
+scripts
+shared
+mobile
+source-code
+*.md
+!backend/**/*.md
+
+frontend
+**/.vs
+**/.idea
+**/node_modules
+**/dist
+**/bin
+**/obj
+**/TestResults
+**/test-results
+**/playwright-report
+**/*.pdb
+**/*.user
+
+# Large optional templates — add locally; see reference-data/README.md
+reference-data/*.xlsx
+reference-data/*.XLSX
