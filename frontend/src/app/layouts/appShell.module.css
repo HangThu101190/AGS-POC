@@ -1,0 +1,340 @@
+/* Web shell — aligned with prototype AGS_Demo.jsx webStyles */
+
+.shell {
+  --ags-shell-header-height: var(--ags-header-height, 56px);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1200;
+  width: min(280px, 88vw);
+  max-width: 100%;
+  background: var(--ags-sidebar);
+  color: var(--ags-primary-on);
+  display: flex;
+  flex-direction: column;
+  padding: max(0.75rem, env(safe-area-inset-top)) 0 max(1rem, env(safe-area-inset-bottom));
+  transform: translateX(-105%);
+  transition: transform 0.22s ease;
+  box-shadow: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sidebarOpen {
+  transform: translateX(0);
+  box-shadow: 8px 0 32px rgb(15 23 42 / 28%);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  border: none;
+  margin: 0;
+  padding: 0;
+  background: rgb(15 23 42 / 45%);
+  cursor: pointer;
+  animation: shellFadeIn 0.2s ease;
+}
+
+@keyframes shellFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  min-height: var(--ags-shell-header-height);
+  box-sizing: border-box;
+  padding: 0 max(0.75rem, env(safe-area-inset-right)) 0 max(0.75rem, env(safe-area-inset-left));
+  background: var(--ags-surface);
+  border-bottom: 1px solid var(--ags-gray-light, #e9e9e9);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.topbarStart {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.topbarWeek {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  min-width: 0;
+}
+
+.weekMeta {
+  font-size: var(--ags-font-size-caption);
+  font-weight: 600;
+  color: var(--ags-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.menuBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--ags-touch-min, 44px);
+  height: var(--ags-touch-min, 44px);
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--ags-border);
+  border-radius: var(--ags-radius, 8px);
+  background: var(--ags-surface);
+  color: var(--ags-primary);
+  cursor: pointer;
+}
+
+.menuBtn:hover {
+  background: var(--ags-primary-soft);
+  border-color: var(--ags-primary);
+}
+
+.menuBtn:focus-visible {
+  outline: 2px solid var(--ags-primary);
+  outline-offset: 2px;
+}
+
+.userChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 5px;
+  border: 1px solid var(--ags-border);
+  border-radius: var(--ags-radius);
+  background: var(--ags-surface);
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  background: var(--ags-primary);
+  color: var(--ags-yellow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.topbarName {
+  font-weight: 600;
+  font-size: var(--ags-font-size-body);
+  color: var(--ags-text-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbarDetail {
+  font-size: var(--ags-font-size-caption);
+  color: var(--ags-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbarActions {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.content {
+  padding: var(--ags-content-py) var(--ags-content-px);
+  padding-bottom: max(var(--ags-content-py), env(safe-area-inset-bottom));
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 10px 12px 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+  margin-bottom: 0.5rem;
+}
+
+.brand img {
+  width: 100%;
+  max-width: 170px;
+  max-height: 56px;
+  height: auto;
+  object-fit: contain;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--ags-touch-min, 44px);
+  padding: 10px 16px;
+  border: none;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  font-family: var(--ags-font-family);
+  font-size: var(--ags-font-size-nav);
+  font-weight: 500;
+  line-height: 1.43;
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.navLink:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ags-primary-on);
+}
+
+.navLinkActive {
+  background: rgba(255, 255, 255, 0.18);
+  border-left: 3px solid var(--ags-yellow);
+  color: var(--ags-yellow);
+  font-weight: 600;
+}
+
+.navIcon {
+  width: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.navLabel {
+  flex: 1;
+  text-align: left;
+}
+
+.navStar {
+  color: var(--ags-yellow);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .shell {
+    --ags-shell-header-height: 40px;
+  }
+}
+
+@media (min-width: 768px) {
+  .shell {
+    display: grid;
+    grid-template-columns: var(--ags-sidebar-width) minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: static;
+    width: auto;
+    transform: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .sidebarOpen {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .backdrop,
+  .menuBtn {
+    display: none;
+  }
+
+  .topbar {
+    padding: 0 1rem;
+  }
+
+  .content {
+    --ags-content-px: 1rem;
+    --ags-content-py: 1rem;
+    padding: var(--ags-content-py) var(--ags-content-px);
+  }
+
+  .brand {
+    height: var(--ags-shell-header-height);
+    min-height: var(--ags-shell-header-height);
+    padding: 0 12px;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--ags-gray-light, #e9e9e9);
+  }
+
+  .brand img {
+    max-width: 180px;
+    max-height: calc(var(--ags-shell-header-height) - 12px);
+  }
+
+  .nav {
+    padding-top: 0.5rem;
+  }
+
+  .navLink {
+    min-height: auto;
+  }
+}

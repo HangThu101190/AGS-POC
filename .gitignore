@@ -1,0 +1,76 @@
+# --- Root (local / agent / compose) ---
+.claude/
+docs/
+e2e/
+ops/
+scripts/
+shared/
+AGENTS.md
+README.md
+docker-compose.yml
+
+# --- Environment ---
+.env
+.env.example
+.env.local
+.env.*.local
+.env.docker
+secrets.json
+
+# --- OS ---
+.DS_Store
+
+# --- Backend (.NET) ---
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+publish/
+*.dll
+*.pdb
+*.cache
+.vs/
+.idea/
+*.user
+*.suo
+*.DotSettings.user
+TestResults/
+[Tt]est[Rr]esult*/
+*.coverage
+*.coveragexml
+[Ll]ogs/
+
+# --- Frontend / Mobile (Node, Vite, Expo, RN) ---
+node_modules/
+.npm-cache/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+.eslintcache
+coverage/
+test-results/
+playwright-report/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.expo/
+web-build/
+expo-env.d.ts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+.metro-health-check*
+**/android/**/build/
+**/.gradle/
+**/local.properties
+**/ios/build/
+**/ios/Pods/
+**/DerivedData/
+*.xcuserdata
+
+# --- Logs (global) ---
+*.log

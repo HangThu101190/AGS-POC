@@ -1,0 +1,70 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.permCol {
+  text-align: left;
+  padding: 10px 12px;
+  min-width: 200px;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--ags-surface, #fff);
+  border-bottom: 1px solid var(--ags-border, #e2e8f0);
+}
+
+.roleCol {
+  text-align: center;
+  padding: 10px 8px;
+  min-width: 88px;
+  border-bottom: 1px solid var(--ags-border, #e2e8f0);
+  vertical-align: bottom;
+}
+
+.roleName {
+  display: block;
+  font-weight: 600;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.roleCode {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--ags-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.permCell {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ags-border, #e2e8f0);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--ags-surface, #fff);
+}
+
+.permLabel {
+  display: block;
+  font-weight: 500;
+}
+
+.permCode {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--ags-muted, #64748b);
+  font-family: ui-monospace, monospace;
+}
+
+.checkCell {
+  text-align: center;
+  padding: 4px;
+  border-bottom: 1px solid var(--ags-border, #e2e8f0);
+}
+
+.checkCell:hover {
+  background: rgba(3, 59, 125, 0.04);
+}

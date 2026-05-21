@@ -1,0 +1,86 @@
+/* Layout / resets — colors & fonts come from components/theme/tokens.ts via UiThemeProvider */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: var(--ags-font-family);
+  font-size: var(--ags-font-size-body);
+  line-height: 1.5;
+  color: var(--ags-text-body);
+  background: var(--ags-bg);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 100%;
+}
+
+a {
+  color: var(--ags-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--ags-primary-hover);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+/* Horizontal scroll containers (tables) — momentum on iOS */
+@media (max-width: 899px) {
+  .ags-scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ags-primary);
+  outline-offset: 2px;
+}
+
+.ag-row-vip {
+  background-color: #fffbeb !important;
+  box-shadow: inset 3px 0 0 #f59e0b;
+}
